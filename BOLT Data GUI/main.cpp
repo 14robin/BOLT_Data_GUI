@@ -1,19 +1,18 @@
 /* BOLT Data GUI.cpp : Main() */
 
-/* Default Includes */
+/* Includes */
 #pragma once
 #include "framework.h"
+#include "eHandler.h"
+#include <wx/stattext.h>
+#include <wx/panel.h>
 
-// If Precompilation is Supported Include "wx/wx.h".
+/* If Precompilation is Supported Include "wx/wx.h" */
 #include <wx/wxprec.h>
 #ifndef WX_PRECOMP
 #include <wx/wx.h>
 #endif
 
-/* Additional Includes */
-#include "eHandler.h"
-#include <wx/stattext.h>
-#include <wx/panel.h>
 
 /* Create Abstract Application Structure */
 class MyApp : public wxApp

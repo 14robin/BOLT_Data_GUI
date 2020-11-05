@@ -1,5 +1,6 @@
+/* Event Handler of Desktop Application */
 
-
+/* Include */
 #include "eHandler.h"
 
 /* Event ID's */
@@ -7,7 +8,9 @@ enum
 {
     ID_Hello = 1,
     ID_View_SystemAnalysis = 2,
-    ID_View_SystemOverview = 3
+    ID_View_SystemOverview = 3,
+    ID_Button_SA = 4,
+    ID_Button_SO = 5
 };
 
 /* Event Table */
@@ -17,6 +20,10 @@ EVT_MENU(wxID_EXIT, MyFrame::OnExit)
 EVT_MENU(wxID_ABOUT, MyFrame::OnAbout)
 EVT_MENU(ID_View_SystemAnalysis, MyFrame::OnViewSA)
 EVT_MENU(ID_View_SystemOverview, MyFrame::OnViewSO)
+
+EVT_BUTTON(ID_Button_SA, MyFrame::OnViewSA)
+EVT_BUTTON(ID_Button_SO, MyFrame::OnViewSO)
+
 wxEND_EVENT_TABLE()
 
 
@@ -26,117 +33,91 @@ wxEND_EVENT_TABLE()
 
 /* -------------------------------------------- NEW SHIT -------------------------------------------- */
 
-class LeftPanel : public wxPanel
+
+/* Top Panel Class */
+class TopPanel : public wxPanel
 {
 public:
-    LeftPanel(wxPanel* parent);
+    /* Default Constructor */
+    TopPanel(wxPanel* parent);
 
-    //void OnPlus(wxCommandEvent& event);
-    //void OnMinus(wxCommandEvent& event);
-
-    //wxButton* m_plus;
-    //wxButton* m_minus;
-    //wxPanel* m_parent;
-    //int count;
 
 };
 
-class RightPanel : public wxPanel
+/* Bottom Panel Class */
+class BottomPanel : public wxPanel
 {
 public:
-    RightPanel(wxPanel* parent);
-
-    //void OnSetText(wxCommandEvent& event);
-
-    //wxStaticText* m_text;
-
+    /* Default Constructor */
+    BottomPanel(wxPanel* parent);
 };
 
-const int ID_PLUS = 101;
-const int ID_MINUS = 102;
 
-LeftPanel::LeftPanel(wxPanel* parent)
-    : wxPanel(parent, -1, wxPoint(-1, -1), wxSize(-1, -1), wxBORDER_DEFAULT)
+/* Default Constructor */
+TopPanel::TopPanel(wxPanel* parent): wxPanel(parent, -1, wxPoint(-1, -1), wxSize(40, 10), wxBORDER_DEFAULT)
 {
-
+    /* Basic Setup */
     SetBackgroundColour(wxColour(*wxLIGHT_GREY));
 
+    wxSize minSize(500, 200);
+    SetMinSize(minSize);
+
+    /* Add Event Button */
+    wxButton* HelloWorld = new wxButton(this, ID_Button_SA, _T("System Analysis"), wxDefaultPosition, wxDefaultSize, 0);
 
 
-    //count = 0;
-    //m_parent = parent;
-    //m_plus = new wxButton(this, ID_PLUS, wxT("+"),
-    //    wxPoint(10, 10));
-    //m_minus = new wxButton(this, ID_MINUS, wxT("-"),
-    //    wxPoint(10, 60));
-    //Connect(ID_PLUS, wxEVT_COMMAND_BUTTON_CLICKED,
-    //    wxCommandEventHandler(LeftPanel::OnPlus));
-    //Connect(ID_MINUS, wxEVT_COMMAND_BUTTON_CLICKED,
-    //    wxCommandEventHandler(LeftPanel::OnMinus));
+    /* Add Title */
+
+    /* Add Description */
+
+
+
 }
 
-//void LeftPanel::OnPlus(wxCommandEvent& WXUNUSED(event))
-//{
-//    count++;
-//
-//    Communicate* comm = (Communicate*)m_parent->GetParent();
-//    comm->m_rp->m_text->SetLabel(wxString::Format(wxT("%d"), count));
-//}
-//
-//void LeftPanel::OnMinus(wxCommandEvent& WXUNUSED(event))
-//{
-//    count--;
-//
-//    Communicate* comm = (Communicate*)m_parent->GetParent();
-//    comm->m_rp->m_text->SetLabel(wxString::Format(wxT("%d"), count));
-//}
 
-
-RightPanel::RightPanel(wxPanel* parent)
-    : wxPanel(parent, wxID_ANY, wxDefaultPosition,
-        wxSize(270, 150), wxBORDER_DEFAULT)
+/* Default Constructor */
+BottomPanel::BottomPanel(wxPanel* parent): wxPanel(parent, wxID_ANY, wxDefaultPosition, wxSize(40, 10), wxBORDER_DEFAULT)
 {
+    /* Basic Setup */
     SetBackgroundColour(wxColour(*wxLIGHT_GREY));
 
+    wxSize minSize(500, 200);
+    SetMinSize(minSize);
 
-    //m_text = new wxStaticText(this, -1, wxT("0"), wxPoint(40, 60));
+    /* Copy Top Panel but Change Items */
+        /* Add Event Button */
+    wxButton* HelloWorld = new wxButton(this, ID_Button_SO, _T("System Overview"), wxDefaultPosition, wxDefaultSize, 0);
+
 }
 
 
 
-class Communicate : public wxFrame
+
+/* Default Panel Class */
+class DefaultPanel : public wxPanel
 {
 public:
-    Communicate(const wxString& title);
+    /* Default Constructor */
+    DefaultPanel(wxWindow* parent);
 
 
-    LeftPanel* m_lp;
-    RightPanel* m_rp;
-    wxPanel* m_parent;
 };
 
-Communicate::Communicate(const wxString& title)
-    : wxFrame(NULL, wxID_ANY, title, wxDefaultPosition, wxSize(290, 150))
+/* Default Constructor */
+DefaultPanel::DefaultPanel(wxWindow * parent)
 {
-    m_parent = new wxPanel(this, wxID_ANY);
+    wxPanel* p_Panel = new wxPanel(parent, wxID_ANY);
+    wxBoxSizer* p_Box = new wxBoxSizer(wxVERTICAL);
+    TopPanel* p_Tpanel = new TopPanel(p_Panel);
+    BottomPanel* p_Bpanel = new BottomPanel(p_Panel);
 
-    wxBoxSizer* hbox = new wxBoxSizer(wxVERTICAL);
+    p_Box->Add(p_Tpanel, 1, wxEXPAND | wxALL, 5);
+    p_Box->Add(p_Bpanel, 1, wxEXPAND | wxALL, 5);
 
-    m_lp = new LeftPanel(m_parent);
-    m_rp = new RightPanel(m_parent);
-
-    hbox->Add(m_lp, 1, wxEXPAND | wxALL, 5);
-    hbox->Add(m_rp, 1, wxEXPAND | wxALL, 5);
-
-    m_parent->SetSizer(hbox);
+    p_Panel->SetSizer(p_Box);
 
     this->Centre();
 }
-
-
-
-
-
 
 
 
@@ -149,6 +130,10 @@ Communicate::Communicate(const wxString& title)
 MyFrame::MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size)
     : wxFrame(NULL, wxID_ANY, title, pos, size)
 {
+    wxSize minSize(500, 500);
+    SetMinSize(minSize);
+ 
+    
     /* NEW MENU */
     wxMenuBar* menuBar = new wxMenuBar;
 
@@ -177,9 +162,29 @@ MyFrame::MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size)
     CreateStatusBar();
     SetStatusText("Welcome to wxWidgets!");
 
-    /* ADD PANELS */
-    Communicate* communicate = new Communicate(wxT("Widgets communicate"));
-    communicate->Show(true);
+    /* Initialize Panels Avalible */
+    p_defaultPanel = new DefaultPanel(this);
+    //wxPanel* p_SystemAnalysisPanel = new SystemAnalysisPanel;
+    //wxPanel* p_SystemOverviewPanel = new SystemOverviewPanel;
+
+    /* ADD Sections to Default Window - Clean Up (store in defualt class ? ) */
+    p_defaultPanel->Show(true);
+    //p_SystemAnalysisPanel->Show(false);
+    //p_SystemOverviewPanel->Show(false);
+
+
+
+    //wxPanel* p_Panel = new wxPanel(this, wxID_ANY);
+    //wxBoxSizer* p_Box = new wxBoxSizer(wxVERTICAL);
+    //TopPanel* p_Tpanel = new TopPanel(p_Panel);
+    //BottomPanel* p_Bpanel = new BottomPanel(p_Panel);
+
+    //p_Box->Add(p_Tpanel, 1, wxEXPAND | wxALL, 5);
+    //p_Box->Add(p_Bpanel, 1, wxEXPAND | wxALL, 5);
+
+    //p_Panel->SetSizer(p_Box);
+
+    //this->Centre();
 
 }
 
@@ -215,5 +220,30 @@ void MyFrame::OnViewSA(wxCommandEvent& event)
 /* EVENT HANDLER - SYSTEM OVERVIEW */
 void MyFrame::OnViewSO(wxCommandEvent& event)
 {
-    wxLogMessage("Change to System Overview");
+    p_defaultPanel->Hide();
+
+
+
+    wxLogMessage("Default Gone");
+}
+
+
+
+
+
+
+/* Return Panel Pointers */
+wxPanel* MyFrame::getDefaultPanelPointer()
+{
+    return p_defaultPanel;
+}
+
+wxPanel* MyFrame::getSystemAnalysisPointer()
+{
+    return p_SystemAnalysisPanel;
+}
+
+wxPanel* MyFrame::getSystemOverviewPanelPointer()
+{
+    return p_SystemOverviewPanel;
 }
