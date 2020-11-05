@@ -163,28 +163,35 @@ MyFrame::MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size)
     SetStatusText("Welcome to wxWidgets!");
 
     /* Initialize Panels Avalible */
-    p_defaultPanel = new DefaultPanel(this);
+    //p_defaultPanel = new DefaultPanel(this);
     //wxPanel* p_SystemAnalysisPanel = new SystemAnalysisPanel;
     //wxPanel* p_SystemOverviewPanel = new SystemOverviewPanel;
 
     /* ADD Sections to Default Window - Clean Up (store in defualt class ? ) */
+    //p_defaultPanel->Show(true);
+    ////p_SystemAnalysisPanel->Show(false);
+    ////p_SystemOverviewPanel->Show(false);
+    //p_defaultPanel->Show(false);
+
+
+    /* Create Default Panel*/
+    p_defaultPanel = new wxPanel(this, wxID_ANY);
+    wxBoxSizer* p_Box = new wxBoxSizer(wxVERTICAL);
+    TopPanel* p_Tpanel = new TopPanel(p_defaultPanel);
+    BottomPanel* p_Bpanel = new BottomPanel(p_defaultPanel);
+    p_Box->Add(p_Tpanel, 1, wxEXPAND | wxALL, 5);
+    p_Box->Add(p_Bpanel, 1, wxEXPAND | wxALL, 5);
+    p_defaultPanel->SetSizer(p_Box);
+    this->Centre();
+    // Add SystemAnal Panel
+    // Add SystemOver Panel
+
+
+    /* Add Panels to Default Window */
     p_defaultPanel->Show(true);
     //p_SystemAnalysisPanel->Show(false);
     //p_SystemOverviewPanel->Show(false);
 
-
-
-    //wxPanel* p_Panel = new wxPanel(this, wxID_ANY);
-    //wxBoxSizer* p_Box = new wxBoxSizer(wxVERTICAL);
-    //TopPanel* p_Tpanel = new TopPanel(p_Panel);
-    //BottomPanel* p_Bpanel = new BottomPanel(p_Panel);
-
-    //p_Box->Add(p_Tpanel, 1, wxEXPAND | wxALL, 5);
-    //p_Box->Add(p_Bpanel, 1, wxEXPAND | wxALL, 5);
-
-    //p_Panel->SetSizer(p_Box);
-
-    //this->Centre();
 
 }
 
@@ -214,13 +221,14 @@ void MyFrame::OnHello(wxCommandEvent& event)
 /* EVENT HANDLER - SYSTEM ANALYSIS */
 void MyFrame::OnViewSA(wxCommandEvent& event)
 {
+    p_defaultPanel->Show(false);
     wxLogMessage("Change to System Analysis");
 }
 
 /* EVENT HANDLER - SYSTEM OVERVIEW */
 void MyFrame::OnViewSO(wxCommandEvent& event)
 {
-    p_defaultPanel->Hide();
+    p_defaultPanel->Show(true);
 
 
 

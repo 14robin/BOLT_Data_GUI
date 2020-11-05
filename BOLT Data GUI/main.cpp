@@ -30,6 +30,9 @@ bool MyApp::OnInit()
 {
     MyFrame* frame = new MyFrame("BOLT Data GUI", wxPoint(50, 50), wxSize(650, 550));
     frame->Show(true);
+
+
+
     return true;
 }
 
