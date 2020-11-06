@@ -4,6 +4,8 @@
 #include "framework.h"
 #include <wx/stattext.h>
 #include <wx/panel.h>
+#include "SystemAnalysis.h"
+#include "Default.h"
 
 // If Precompilation is Supported Include "wx/wx.h".
 #include <wx/wxprec.h>
@@ -16,11 +18,7 @@ class MyFrame : public wxFrame
 {
 public:
     MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size);
-    
-    wxPanel* getDefaultPanelPointer();
-    wxPanel* getSystemAnalysisPointer();
-    wxPanel* getSystemOverviewPanelPointer();
-
+  
 
 private:
     void OnHello(wxCommandEvent& event);
