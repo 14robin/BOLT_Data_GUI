@@ -42,71 +42,90 @@ private:
 /* Default Constructor */
 SystemAnalysisPanel::SystemAnalysisPanel(wxWindow * parent): wxPanel(parent, wxID_ANY)
 {
-    SetBackgroundColour(wxColor(*wxRED));
-
-    /* Create Com Port to Read UART Data */
-    HANDLE hComm;
-    //TCHAR* pcCommPort = TEXT("COM7");
-    //const char* device = "COM7";
-    
-    LPCWSTR a = L"COM7";
-
-    hComm = CreateFile(a, GENERIC_READ, 0, NULL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, NULL);
-
-    /* Check if Port is Open */
-    if (hComm == INVALID_HANDLE_VALUE)
-        wxLogMessage("Error in opening serial port");
-    else
-        wxLogMessage("opening serial port successful"); 
+    SetBackgroundColour(wxColor(*wxBLUE));
 
 
+    ///* Initialize Communication Port */
+    //HANDLE hComm;
+    //LPCWSTR a = L"COM7";
+    //hComm = CreateFile(a, GENERIC_READ, 0, NULL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, NULL);
 
-    DCB dcbSerialParams = { 0 }; // Initializing DCB structure
-    dcbSerialParams.DCBlength = sizeof(dcbSerialParams);
 
-    GetCommState(hComm, &dcbSerialParams);
+    ///* Check if Port is Open */
+    //if (hComm == INVALID_HANDLE_VALUE)
+    //    wxLogMessage("Error in opening serial port");
+    //else
+    //    wxLogMessage("opening serial port successful"); 
 
-    dcbSerialParams.BaudRate = CBR_9600;  // Setting BaudRate = 9600
-    dcbSerialParams.ByteSize = 8;         // Setting ByteSize = 8
-    dcbSerialParams.StopBits = ONESTOPBIT;// Setting StopBits = 1
-    dcbSerialParams.Parity = NOPARITY;  // Setting Parity = None
 
-    SetCommState(hComm, &dcbSerialParams);
+    ///* Initialize DCB Structure */
+    //DCB dcbSerialParams = { 0 };
+    //dcbSerialParams.DCBlength = sizeof(dcbSerialParams);
+
+    //GetCommState(hComm, &dcbSerialParams);
+
+    //dcbSerialParams.BaudRate = CBR_9600;    // Setting BaudRate = 9600
+    //dcbSerialParams.ByteSize = 8;           // Setting ByteSize = 8
+    //dcbSerialParams.StopBits = ONESTOPBIT;  // Setting StopBits = 1
+    //dcbSerialParams.Parity = NOPARITY;      // Setting Parity = None
+
+    //SetCommState(hComm, &dcbSerialParams);
 
 
 
-
-    SetCommMask(hComm, EV_RXCHAR);
-
-    DWORD dwEventMask;
-    WaitCommEvent(hComm, &dwEventMask, NULL);
-
-    char TempChar;                              //Temporary character used for reading
-    char SerialBuffer[256];                     //Buffer for storing Rxed Data
-    DWORD NoBytesRead;
-    int i = 0;                                  // Increment Position of Incoming Data
-
-    COMMTIMEOUTS timeouts = { 0 };
-    timeouts.ReadTotalTimeoutConstant = 100;
-
-    /* Continuous Execution B/C UART is ALWAYS Transmitting */
-    do
-    {
-        ReadFile(hComm,           //Handle of the Serial port
-            &TempChar,       //Temporary character
-            sizeof(TempChar),//Size of TempChar
-            &NoBytesRead,    //Number of bytes read
-            NULL);
-
-        SerialBuffer[i] = TempChar;// Store Tempchar into buffer
-        i++;
-    }
-    while (NoBytesRead > 0);
-    //while (TempChar != '7');
-    wxLogMessage(SerialBuffer);
+    ///* Create an Event - Recieve Character */
+    //SetCommMask(hComm, EV_RXCHAR);
 
 
-    CloseHandle(hComm);//Closing the Serial Port
+    ///* Windows will WAIT for Event to Happen - Then Continue ? */
+    //DWORD dwEventMask;
+    //WaitCommEvent(hComm, &dwEventMask, NULL);
+
+
+
+    //char TempChar;                              //Temporary character used for reading
+    //char SerialBuffer[256];                     //Buffer for storing Rxed Data
+    //DWORD NoBytesRead;
+    //int i = 0;                                  // Increment Position of Incoming Data
+
+    //COMMTIMEOUTS timeouts = { 0 };
+    //timeouts.ReadTotalTimeoutConstant = 100;
+
+    ///* Continuous Execution B/C UART is ALWAYS Transmitting */
+    //do
+    //{
+    //    ReadFile(hComm,           //Handle of the Serial port
+    //        &TempChar,       //Temporary character
+    //        sizeof(TempChar),//Size of TempChar
+    //        &NoBytesRead,    //Number of bytes read
+    //        NULL);
+
+    //    SerialBuffer[i] = TempChar;// Store Tempchar into buffer
+    //    i++;
+    //}
+    //while (TempChar != 'x');
+
+    //char SerialBufferCopy[256];
+    //for (int k = 0; k < i; k++)
+    //    SerialBufferCopy[k] = SerialBuffer[k];
+
+    //wxLogMessage(SerialBufferCopy);
+
+
+    //CloseHandle(hComm);//Closing the Serial Port
+
+
+    Port xBee;
+    xBee.Read();
+    xBee.Read();
+    xBee.Read();
+    xBee.closePort();
+
+
+
+
+
+
 
 
     //wxPanel* p_Panel = new wxPanel(parent, wxID_ANY);

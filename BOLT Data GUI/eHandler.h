@@ -6,6 +6,7 @@
 #include <wx/panel.h>
 #include<windows.h>
 #include<stdio.h>
+#include"portCommuniction.h"
 
 // If Precompilation is Supported Include "wx/wx.h".
 #include <wx/wxprec.h>
