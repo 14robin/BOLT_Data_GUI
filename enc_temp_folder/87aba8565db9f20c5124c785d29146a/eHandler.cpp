@@ -81,10 +81,10 @@ SystemAnalysisPanel::SystemAnalysisPanel(wxWindow * parent): wxPanel(parent, wxI
     DWORD dwEventMask;
     WaitCommEvent(hComm, &dwEventMask, NULL);
 
-    char TempChar;                              //Temporary character used for reading
-    char SerialBuffer[256];                     //Buffer for storing Rxed Data
+    char TempChar; //Temporary character used for reading
+    char SerialBuffer[256];//Buffer for storing Rxed Data
     DWORD NoBytesRead;
-    int i = 0;                                  // Increment Position of Incoming Data
+    int i = 0;
 
     COMMTIMEOUTS timeouts = { 0 };
     timeouts.ReadTotalTimeoutConstant = 100;
