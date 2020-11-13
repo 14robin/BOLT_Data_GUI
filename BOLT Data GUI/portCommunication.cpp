@@ -77,13 +77,12 @@ void Port::Read()
 
     }
 
-    char parsedData[7];
     for (int k = 0; k < 6; k++)
         parsedData[k] = CollectiveDB[k];
 
     parsedData[6] = '\0';
 
-    wxLogMessage(parsedData);
+    //wxLogMessage(parsedData);
 
     PurgeComm(hComm, PURGE_RXCLEAR);
 

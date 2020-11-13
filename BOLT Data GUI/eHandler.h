@@ -21,6 +21,7 @@ class MyFrame : public wxFrame
 {
 public:
     MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size);
+    wxTextCtrl* MainEditBox;
 
 private:
     void OnHello(wxCommandEvent& event);

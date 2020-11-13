@@ -11,7 +11,8 @@ enum{
     ID_Button_SA = 4,
     ID_Button_SO = 5,
 
-    ID_Timer = 66
+    ID_Timer = 66,
+    TEXT_Main = 67
 };
 
 /* Event Table */
@@ -199,11 +200,16 @@ MyFrame::MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size)
 
 
     wxTimer* m_timer = new wxTimer(this, ID_Timer);
-    m_timer->Start(5000);
+    m_timer->Start(600);
 
     /* Create System Analysis Panel*/
     p_SystemAnalysisPanel = new SystemAnalysisPanel(this);
     p_SystemAnalysisPanel->Show(true);
+
+
+    MainEditBox = new wxTextCtrl(this, TEXT_Main, "<<-- Data ", wxDefaultPosition, wxSize(650, 550),
+        wxTE_MULTILINE | wxTE_RICH, wxDefaultValidator, wxTextCtrlNameStr);
+
 
 
 }
@@ -250,4 +256,6 @@ void MyFrame::OnViewSO(wxCommandEvent& event)
 void MyFrame::TimerCall(wxTimerEvent& event)
 {
     xBee.Read();
+    MainEditBox->WriteText(xBee.parsedData);
+    MainEditBox->WriteText('\n');
 }

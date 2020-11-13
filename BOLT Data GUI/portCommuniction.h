@@ -28,7 +28,7 @@ public:
     void closePort();
 
     /* Parse Data */
-
+    char parsedData[7];
 
     /* Actual Data Variables - Public */
 
