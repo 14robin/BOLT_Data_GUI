@@ -24,12 +24,17 @@ Port::Port()
 
     GetCommState(hComm, &dcbSerialParams);
 
-    dcbSerialParams.BaudRate = CBR_9600;    // Setting BaudRate = 9600
+    dcbSerialParams.BaudRate = CBR_57600;    // Setting BaudRate = 9600
     dcbSerialParams.ByteSize = 8;           // Setting ByteSize = 8
     dcbSerialParams.StopBits = ONESTOPBIT;  // Setting StopBits = 1
     dcbSerialParams.Parity = NOPARITY;      // Setting Parity = None
 
     SetCommState(hComm, &dcbSerialParams);
+
+    COMMTIMEOUTS timeouts = { 0 };
+    timeouts.ReadIntervalTimeout = 50; // in milliseconds
+    timeouts.ReadTotalTimeoutConstant = 40; // in milliseconds
+    timeouts.ReadTotalTimeoutMultiplier = 10; // in milliseconds
 
 
     /* Create an Event - Recieve Character */
@@ -44,58 +49,39 @@ Port::Port()
 void Port::Read()
 {
     /* Clear RX Register */
-    PurgeComm( hComm, PURGE_RXCLEAR );
+    PurgeComm(hComm, PURGE_RXCLEAR);
 
     /* Wait Until Character has Been Recieved - RX buffer fills continuously? */
     DWORD dwEventMask = 0;
     WaitCommEvent(hComm, &dwEventMask, NULL);
 
     /* ReadFile Local Variables */
-    char TempChar = '?';            //Temporary character used for reading
-    char SerialBuffer[256];         //Buffer for storing Rxed Data
-    DWORD NoBytesRead = 1;
-    int i = 0;                      // Index of Serial Buffer
+    char CollectiveDB[256];                   // Should be big enough to hold entire incomiing data
+    char SingleDB = ' ';
+    DWORD BytesRead = 1;
+    int indexDB = 0;
 
-    /* Experiemental Variables */
-    int index1 = 0;
-    bool index1found = false;
-    bool status;
+    //for (int k = 0; k < 256; k++)
+    //    CollectiveDB[k] = 'k';
 
-    
-    /* Loop Until No Longer Reading Bytes */
-    while (NoBytesRead == 1)
+    while (BytesRead > 0)
     {
-        status = ReadFile(hComm,            //Handle of the Serial port
-            &TempChar,                      //Temporary character
-            sizeof(TempChar),               //Size of TempChar
-            &NoBytesRead,                   //Number of bytes read
+        ReadFile(hComm,            //Handle of the Serial port
+            &SingleDB,                      //Temporary character
+            sizeof(SingleDB),               //Size of TempChar
+            &BytesRead,                   //Number of bytes read
             NULL);
 
-        if (status == false)
-            wxLogMessage("READ HAS FAILED");
-
-        if (TempChar == '1' && index1found == false)
-        {
-            index1found = true;
-            index1 = i;
-        }
-
-        SerialBuffer[i] = TempChar;// Store Tempchar into buffer
-        i++;
-
+        CollectiveDB[indexDB] = SingleDB;
+        indexDB++;
 
     }
 
-    int index = 0;
+    char parsedData[6];
+    for (int k = 0; k < 6; k++)
+        parsedData[k] = CollectiveDB[k];
 
-    char SerialBufferCopy[6];
-    for (int k = index1; k < index1 + 6; k++)
-    {
-        SerialBufferCopy[index] = SerialBuffer[k];
-        index++;
-    }
-
-    wxLogMessage(SerialBufferCopy);
+    wxLogMessage(parsedData);
 
 
 
