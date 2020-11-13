@@ -49,7 +49,7 @@ Port::Port()
 void Port::Read()
 {
     /* Clear RX Register */
-    PurgeComm(hComm, PURGE_RXCLEAR);
+    //PurgeComm(hComm, PURGE_RXCLEAR);
 
     /* Wait Until Character has Been Recieved - RX buffer fills continuously? */
     DWORD dwEventMask = 0;
@@ -77,13 +77,15 @@ void Port::Read()
 
     }
 
-    char parsedData[6];
+    char parsedData[7];
     for (int k = 0; k < 6; k++)
         parsedData[k] = CollectiveDB[k];
 
+    parsedData[6] = '\0';
+
     wxLogMessage(parsedData);
 
-
+    PurgeComm(hComm, PURGE_RXCLEAR);
 
 }
 

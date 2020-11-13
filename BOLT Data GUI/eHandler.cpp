@@ -9,7 +9,9 @@ enum{
     ID_View_SystemAnalysis = 2,
     ID_View_SystemOverview = 3,
     ID_Button_SA = 4,
-    ID_Button_SO = 5
+    ID_Button_SO = 5,
+
+    ID_Timer = 66
 };
 
 /* Event Table */
@@ -21,6 +23,9 @@ EVT_MENU(ID_View_SystemAnalysis, MyFrame::OnViewSA)
 EVT_MENU(ID_View_SystemOverview, MyFrame::OnViewSO)
 EVT_BUTTON(ID_Button_SA, MyFrame::OnViewSA)
 EVT_BUTTON(ID_Button_SO, MyFrame::OnViewSO)
+
+EVT_TIMER(ID_Timer, MyFrame::TimerCall)
+
 wxEND_EVENT_TABLE()
 
 
@@ -115,17 +120,25 @@ SystemAnalysisPanel::SystemAnalysisPanel(wxWindow * parent): wxPanel(parent, wxI
     //CloseHandle(hComm);//Closing the Serial Port
 
 
-    Port xBee;
-    xBee.Read();
-    xBee.Read();
-    xBee.Read();
-    xBee.closePort();
+    //Port xBee;
+    //xBee.Read();
+    //xBee.Read();
+    //xBee.Read();
+    //xBee.closePort();
+
+
+    //static const int INTERVAL = 300; // milliseconds
 
 
 
+    
+    //wxFFileOutputStream output(stderr);
+    //wxTextOutputStream cout(output);
+    //cout << "This is a text line" << endl;
+    //cout << 1234;
+    //cout << 1.23456;
 
-
-
+    
 
 
     //wxPanel* p_Panel = new wxPanel(parent, wxID_ANY);
@@ -184,6 +197,10 @@ MyFrame::MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size)
     CreateStatusBar();
     SetStatusText("Welcome to wxWidgets!");
 
+
+    wxTimer* m_timer = new wxTimer(this, ID_Timer);
+    m_timer->Start(5000);
+
     /* Create System Analysis Panel*/
     p_SystemAnalysisPanel = new SystemAnalysisPanel(this);
     p_SystemAnalysisPanel->Show(true);
@@ -224,4 +241,13 @@ void MyFrame::OnViewSA(wxCommandEvent& event)
 void MyFrame::OnViewSO(wxCommandEvent& event)
 {
     wxLogMessage("Default Gone");
+}
+
+
+
+
+/* EVENT HANDLER - SYSTEM OVERVIEW */
+void MyFrame::TimerCall(wxTimerEvent& event)
+{
+    xBee.Read();
 }

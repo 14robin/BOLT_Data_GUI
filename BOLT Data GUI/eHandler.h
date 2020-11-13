@@ -7,6 +7,8 @@
 #include<windows.h>
 #include<stdio.h>
 #include"portCommuniction.h"
+#include <wx/txtstrm.h>
+#include <wx/wfstream.h>
 
 // If Precompilation is Supported Include "wx/wx.h".
 #include <wx/wxprec.h>
@@ -27,6 +29,9 @@ private:
     void OnViewSA(wxCommandEvent& event);
     void OnViewSO(wxCommandEvent& event);
 
+    void TimerCall(wxTimerEvent& event);
+
+    Port xBee;
     wxPanel* p_SystemAnalysisPanel;
 
     wxDECLARE_EVENT_TABLE();
