@@ -4,11 +4,14 @@
 #include "framework.h"
 #include <wx/stattext.h>
 #include <wx/panel.h>
-#include<windows.h>
-#include<stdio.h>
-#include"portCommuniction.h"
+#include <windows.h>
+#include <stdio.h>
+#include "portCommuniction.h"
 #include <wx/txtstrm.h>
 #include <wx/wfstream.h>
+
+#define ASIO_STANDALONE
+#include "asio.hpp"
 
 // If Precompilation is Supported Include "wx/wx.h".
 #include <wx/wxprec.h>
@@ -32,7 +35,7 @@ private:
 
     void TimerCall(wxTimerEvent& event);
 
-    Port xBee;
+    //Port xBee;
     wxPanel* p_SystemAnalysisPanel;
 
     wxDECLARE_EVENT_TABLE();

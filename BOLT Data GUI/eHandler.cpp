@@ -156,6 +156,71 @@ SystemAnalysisPanel::SystemAnalysisPanel(wxWindow * parent): wxPanel(parent, wxI
 }
 
 
+class serialLate
+{
+public:
+
+    char nIncomingByte;
+
+    asio::io_context context;
+    std::thread thrContext;
+    std::unique_ptr<asio::serial_port> portX;
+
+    bool OnUserCreate()
+    {
+        portX.reset(new asio::serial_port(context));
+        asio::error_code ec;
+        portX->open("COM5", ec);
+
+        if (portX->is_open())
+        {
+            wxLogMessage("robot port open");
+        }
+
+        portX->set_option(asio::serial_port_base::character_size());
+        portX->set_option(asio::serial_port_base::stop_bits());
+        portX->set_option(asio::serial_port_base::parity());
+        portX->set_option(asio::serial_port_base::flow_control());
+
+        aRead();
+        thrContext = std::thread([&]() {context.run(); });
+
+        return true;
+    }
+
+    void aRead()
+    {
+        portX->async_read_some(asio::buffer(&nIncomingByte, 1),
+            [this](std::error_code ec, std::size_t length)
+            {
+                if (!ec)
+                {
+                    std::cout << nIncomingByte;
+                    aRead();
+                }
+            });
+    }
+
+    bool OnUserDestroy()
+    {
+        if (portX)
+        {
+            portX->cancel();
+            portX->close();
+        }
+
+        if (thrContext.joinable())
+        {
+            thrContext.join();
+        }
+
+        portX.reset();
+
+        return true;
+    }
+
+};
+
 
 
 
@@ -210,6 +275,84 @@ MyFrame::MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size)
     MainEditBox = new wxTextCtrl(this, TEXT_Main, "<<-- Data ", wxDefaultPosition, wxSize(650, 550),
         wxTE_MULTILINE | wxTE_RICH, wxDefaultValidator, wxTextCtrlNameStr);
 
+    //xBee.Read();
+    //MainEditBox->WriteText(xBee.parsedData);
+    //MainEditBox->WriteText('\n');
+    //xBee.Read();
+    //MainEditBox->WriteText(xBee.parsedData);
+    //MainEditBox->WriteText('\n');
+    //xBee.Read();
+    //MainEditBox->WriteText(xBee.parsedData);
+    //MainEditBox->WriteText('\n');
+    //xBee.closePort();
+
+
+    //asio::io_service io;
+    //asio::serial_port xBee(io, "COM5");
+
+    //if (xBee.is_open())
+    //    wxLogMessage("FUCK YES NOW JUST READ DATA");
+
+
+    //xBee.set_option(asio::serial_port::baud_rate(57600));
+
+    //xBee.set_option(asio::serial_port_base::character_size());
+    //xBee.set_option(asio::serial_port_base::stop_bits());
+    //xBee.set_option(asio::serial_port_base::parity());
+    //xBee.set_option(asio::serial_port_base::flow_control());
+
+    //char nIncomingByte;
+    //xBee.async_read_some(asio::buffer(&nIncomingByte, 1))
+    //   
+    //xBee.set_option(asio::serial_port_base::parity(PARITY_NONE));
+    //xBee.set_option(asio::serial_port_base::baud_rate(BAUD_57600));
+    //xBee.set_option(DATABITS_8);
+
+    //asio::async_read(xBee, asio::buffer(m_read_message.data(), m_read_message.m_header_length), [this](asio::error_code& ec, std::size_t /*length*/)
+
+    //for (;;)
+    //{
+    //    // get a string from the user, sentiel is exit
+    //    std::string input;
+    //    char data[512];
+
+    //    // read bytes from the serial port
+    //    // asio::read will read bytes until the buffer is filled
+    //    size_t nread = asio::read(
+    //        xBee, asio::buffer(data, input.length())
+    //    );
+
+    //    std::string message(data, nread);
+
+    //    char printxBee[512];
+    //    for (int k = 0; k < message.size(); k++)
+    //        printxBee[k] = message[k];
+    //    wxLogMessage(printxBee);
+    //}
+
+
+
+    //char data[256];
+    //std::string input;
+
+    //size_t nread = asio::read(
+    //    xBee, asio::buffer(data, input.length())
+    //);
+
+    //std::string message(data, nread);
+
+
+
+
+    //xBee.close();
+
+
+    serialLate xBee;
+    xBee.OnUserCreate();
+
+    xBee.aRead();
+
+    xBee.OnUserDestroy();
 
 
 }
@@ -255,7 +398,8 @@ void MyFrame::OnViewSO(wxCommandEvent& event)
 /* EVENT HANDLER - SYSTEM OVERVIEW */
 void MyFrame::TimerCall(wxTimerEvent& event)
 {
-    xBee.Read();
-    MainEditBox->WriteText(xBee.parsedData);
-    MainEditBox->WriteText('\n');
+    //xBee.Read();
+    //MainEditBox->WriteText(xBee.parsedData);
+    //MainEditBox->WriteText('\n');
+    //xBee.closePort();
 }

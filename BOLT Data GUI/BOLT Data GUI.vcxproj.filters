@@ -30,6 +30,9 @@
     <ClInclude Include="portCommuniction.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\asio_Lib\asio-1.18.0\include\asio.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="eHandler.cpp">
