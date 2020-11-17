@@ -156,70 +156,7 @@ SystemAnalysisPanel::SystemAnalysisPanel(wxWindow * parent): wxPanel(parent, wxI
 }
 
 
-class serialLate
-{
-public:
 
-    char nIncomingByte;
-
-    asio::io_context context;
-    std::thread thrContext;
-    std::unique_ptr<asio::serial_port> portX;
-
-    bool OnUserCreate()
-    {
-        portX.reset(new asio::serial_port(context));
-        asio::error_code ec;
-        portX->open("COM5", ec);
-
-        if (portX->is_open())
-        {
-            wxLogMessage("robot port open");
-        }
-
-        portX->set_option(asio::serial_port_base::character_size());
-        portX->set_option(asio::serial_port_base::stop_bits());
-        portX->set_option(asio::serial_port_base::parity());
-        portX->set_option(asio::serial_port_base::flow_control());
-
-        aRead();
-        thrContext = std::thread([&]() {context.run(); });
-
-        return true;
-    }
-
-    void aRead()
-    {
-        portX->async_read_some(asio::buffer(&nIncomingByte, 1),
-            [this](std::error_code ec, std::size_t length)
-            {
-                if (!ec)
-                {
-                    std::cout << nIncomingByte;
-                    aRead();
-                }
-            });
-    }
-
-    bool OnUserDestroy()
-    {
-        if (portX)
-        {
-            portX->cancel();
-            portX->close();
-        }
-
-        if (thrContext.joinable())
-        {
-            thrContext.join();
-        }
-
-        portX.reset();
-
-        return true;
-    }
-
-};
 
 
 
@@ -231,6 +168,13 @@ public:
 MyFrame::MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size)
     : wxFrame(NULL, wxID_ANY, title, pos, size)
 {
+    xx = new serialLate xBee;
+    xx = &xBee;
+    //xBee.OnUserCreate();
+
+
+    xx->OnUserCreate();
+
     wxSize minSize(500, 500);
     SetMinSize(minSize);
  
@@ -275,16 +219,15 @@ MyFrame::MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size)
     MainEditBox = new wxTextCtrl(this, TEXT_Main, "<<-- Data ", wxDefaultPosition, wxSize(650, 550),
         wxTE_MULTILINE | wxTE_RICH, wxDefaultValidator, wxTextCtrlNameStr);
 
-    //xBee.Read();
-    //MainEditBox->WriteText(xBee.parsedData);
+
+    //MainEditBox->WriteText(xBee.dataIn);
     //MainEditBox->WriteText('\n');
-    //xBee.Read();
-    //MainEditBox->WriteText(xBee.parsedData);
+
+    //MainEditBox->WriteText(xBee.dataIn);
     //MainEditBox->WriteText('\n');
-    //xBee.Read();
-    //MainEditBox->WriteText(xBee.parsedData);
+
+    //MainEditBox->WriteText(xBee.dataIn);
     //MainEditBox->WriteText('\n');
-    //xBee.closePort();
 
 
     //asio::io_service io;
@@ -347,13 +290,10 @@ MyFrame::MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size)
     //xBee.close();
 
 
-    serialLate xBee;
-    xBee.OnUserCreate();
 
-    xBee.aRead();
 
-    xBee.OnUserDestroy();
 
+    //xBee.OnUserDestroy();
 
 }
 
@@ -384,6 +324,7 @@ void MyFrame::OnHello(wxCommandEvent& event)
 void MyFrame::OnViewSA(wxCommandEvent& event)
 {
     wxLogMessage("Change to System Analysis");
+    xx->OnUserDestroy();
 }
 
 /* EVENT HANDLER - SYSTEM OVERVIEW */
