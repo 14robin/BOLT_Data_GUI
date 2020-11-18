@@ -168,12 +168,13 @@ SystemAnalysisPanel::SystemAnalysisPanel(wxWindow * parent): wxPanel(parent, wxI
 MyFrame::MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size)
     : wxFrame(NULL, wxID_ANY, title, pos, size)
 {
-    xx = new serialLate xBee;
-    xx = &xBee;
+    //serialLate xBee;
     //xBee.OnUserCreate();
 
+    movedUart.OnUserCreate();
 
-    xx->OnUserCreate();
+
+
 
     wxSize minSize(500, 500);
     SetMinSize(minSize);
@@ -216,7 +217,7 @@ MyFrame::MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size)
     p_SystemAnalysisPanel->Show(true);
 
 
-    MainEditBox = new wxTextCtrl(this, TEXT_Main, "<<-- Data ", wxDefaultPosition, wxSize(650, 550),
+    MainEditBox = new wxTextCtrl(this, TEXT_Main, "<<-- Data ", wxDefaultPosition, wxSize(1150, 550),
         wxTE_MULTILINE | wxTE_RICH, wxDefaultValidator, wxTextCtrlNameStr);
 
 
@@ -226,8 +227,7 @@ MyFrame::MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size)
     //MainEditBox->WriteText(xBee.dataIn);
     //MainEditBox->WriteText('\n');
 
-    //MainEditBox->WriteText(xBee.dataIn);
-    //MainEditBox->WriteText('\n');
+
 
 
     //asio::io_service io;
@@ -292,7 +292,6 @@ MyFrame::MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size)
 
 
 
-
     //xBee.OnUserDestroy();
 
 }
@@ -323,14 +322,14 @@ void MyFrame::OnHello(wxCommandEvent& event)
 /* EVENT HANDLER - SYSTEM ANALYSIS */
 void MyFrame::OnViewSA(wxCommandEvent& event)
 {
-    wxLogMessage("Change to System Analysis");
-    xx->OnUserDestroy();
+    wxLogMessage("Bolt Port Closed");
+    movedUart.OnUserDestroy();
 }
 
 /* EVENT HANDLER - SYSTEM OVERVIEW */
 void MyFrame::OnViewSO(wxCommandEvent& event)
 {
-    wxLogMessage("Default Gone");
+    wxLogMessage("MOST RECENT DATA IN");
 }
 
 
@@ -339,8 +338,9 @@ void MyFrame::OnViewSO(wxCommandEvent& event)
 /* EVENT HANDLER - SYSTEM OVERVIEW */
 void MyFrame::TimerCall(wxTimerEvent& event)
 {
-    //xBee.Read();
-    //MainEditBox->WriteText(xBee.parsedData);
-    //MainEditBox->WriteText('\n');
-    //xBee.closePort();
+    movedUart.parseDataIn();
+
+
+    MainEditBox->WriteText(movedUart.BoltData);
+    MainEditBox->WriteText('\n');
 }

@@ -24,19 +24,34 @@ class serialLate
 {
 public:
 
-    char dataIn[166];
-
+    char dataIn[165];
+    char startDelimiter = 0x7e;
     char nIncomingByte;
-    char bytearray[256];
-    int kount;
+    int dataInIndex;
+    bool dataInRead;
+
+
+    /* Other Data */
+    char BoltData[256];
 
     asio::io_context context;
     std::thread thrContext;
     std::unique_ptr<asio::serial_port> portX;
 
+    void parseDataIn()
+    {
+        for (int k = 0; k < 148; k++)
+        {
+            if (dataIn[k + 17] == '\0')
+                BoltData[k] = '0';
+            else
+                BoltData[k] = dataIn[k + 17];
+        }
+    }
+
+
     bool OnUserCreate()
     {
-        kount = 0;
 
         portX.reset(new asio::serial_port(context));
         asio::error_code ec;
@@ -44,7 +59,7 @@ public:
 
         if (portX->is_open())
         {
-            wxLogMessage("robot port open");
+            wxLogMessage("Bolt Port Open");
         }
 
         portX->set_option(asio::serial_port::baud_rate(57600));
@@ -53,6 +68,8 @@ public:
         portX->set_option(asio::serial_port_base::parity());
         portX->set_option(asio::serial_port_base::flow_control());
 
+        dataInIndex = 0;
+        dataInRead = false;
         aRead();
         thrContext = std::thread([&]() {context.run(); });
 
@@ -61,14 +78,34 @@ public:
 
     void aRead()
     {
-        portX->async_read_some(asio::buffer(&dataIn, 165),
+        portX->async_read_some(asio::buffer(&nIncomingByte, 1),
             [this](std::error_code ec, std::size_t length)
             {
+                /* If No Error */
                 if (!ec)
                 {
-                    wxLogMessage(dataIn);
+                    /* If Incomming Byte Signals Start of Data Transmission */
+                    if (nIncomingByte == startDelimiter)
+                        dataInRead = true;
+
+                    /* While Reading Data */
+                    if (dataInRead)
+                    {
+                        /* Write Incomming Byte to Data In Variable */
+                        dataIn[dataInIndex] = nIncomingByte;
+                        dataInIndex++;
+
+                        /* End of Data Transmission BASED on LENGTH */
+                        if (dataInIndex > 164)
+                        {
+                            dataInRead = false;
+                            dataInIndex = 0;
+                        }
+                    }
+
+                    /* Set Next Read Function */
                     aRead();
-                }
+                }  
             });
     }
 
@@ -99,7 +136,7 @@ public:
     wxTextCtrl* MainEditBox;
 
 
-    serialLate* xx;
+    serialLate movedUart;
 
     
 
