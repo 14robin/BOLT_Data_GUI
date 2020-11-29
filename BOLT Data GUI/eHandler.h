@@ -6,7 +6,7 @@
 #include <wx/panel.h>
 #include <windows.h>
 #include <stdio.h>
-#include "portCommuniction.h"
+//#include "portCommuniction.h"
 #include <wx/txtstrm.h>
 #include <wx/wfstream.h>
 
@@ -49,13 +49,20 @@ public:
         }
     }
 
+    void parseDataInArduino()
+    {
+        for (int k = 0; k < 99; k++)
+        {
+            BoltData[k] = dataIn[k+1];
+        }
+    }
 
     bool OnUserCreate()
     {
 
         portX.reset(new asio::serial_port(context));
         asio::error_code ec;
-        portX->open("COM5", ec);
+        portX->open("COM7", ec);
 
         if (portX->is_open())
         {
@@ -96,7 +103,7 @@ public:
                         dataInIndex++;
 
                         /* End of Data Transmission BASED on LENGTH */
-                        if (dataInIndex > 164)
+                        if (dataInIndex > 99) // 164 for xBee Data Transmission
                         {
                             dataInRead = false;
                             dataInIndex = 0;

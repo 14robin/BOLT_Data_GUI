@@ -338,9 +338,11 @@ void MyFrame::OnViewSO(wxCommandEvent& event)
 /* EVENT HANDLER - SYSTEM OVERVIEW */
 void MyFrame::TimerCall(wxTimerEvent& event)
 {
-    movedUart.parseDataIn();
+    //movedUart.parseDataIn();
+
+    movedUart.parseDataInArduino();
 
 
-    MainEditBox->WriteText(movedUart.BoltData);
+    MainEditBox->WriteText(movedUart.dataIn);
     MainEditBox->WriteText('\n');
 }
