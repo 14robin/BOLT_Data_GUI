@@ -2,6 +2,7 @@
 /* Includes */
 #pragma once
 #include "framework.h"
+#include "mathplot.h"
 #include <wx/stattext.h>
 #include <wx/panel.h>
 #include <windows.h>
@@ -9,6 +10,7 @@
 //#include "portCommuniction.h"
 #include <wx/txtstrm.h>
 #include <wx/wfstream.h>
+
 
 #define ASIO_STANDALONE
 #include "asio.hpp"
@@ -21,61 +23,8 @@
 
 
 
-//
-//void mpFXYVector::AddData(float x, float y, std::vector<double>& xs, std::vector<double>& ys)
-//{
-//    // Check if the data vectora are of the same size
-//    if (xs.size() != ys.size()) {
-//        wxLogError(_("wxMathPlot error: X and Y vector are not of the same length!"));
-//        return;
-//    }
-//
-//    //Delete first point if you need a filo buffer (i dont need it)
-//    //xs.erase(xs.begin());
-//    //xy.erase(xy.begin());
-//
-//    //Add new Data points at the end
-//    xs.push_back(x);
-//    ys.push_back(y);
-//
-//
-//    // Copy the data:
-//    m_xs = xs;
-//    m_ys = ys;
-//
-//    // Update internal variables for the bounding box.
-//    if (xs.size() > 0)
-//    {
-//        m_minX = xs[0];
-//        m_maxX = xs[0];
-//        m_minY = ys[0];
-//        m_maxY = ys[0];
-//
-//        std::vector<double>::const_iterator  it;
-//
-//        for (it = xs.begin(); it != xs.end(); it++)
-//        {
-//            if (*it < m_minX) m_minX = *it;
-//            if (*it > m_maxX) m_maxX = *it;
-//        }
-//        for (it = ys.begin(); it != ys.end(); it++)
-//        {
-//            if (*it < m_minY) m_minY = *it;
-//            if (*it > m_maxY) m_maxY = *it;
-//        }
-//        m_minX -= 0.5f;
-//        m_minY -= 0.5f;
-//        m_maxX += 0.5f;
-//        m_maxY += 0.5f;
-//    }
-//    else
-//    {
-//        m_minX = -1;
-//        m_maxX = 1;
-//        m_minY = -1;
-//        m_maxY = 1;
-//    }
-//}
+
+
 
 
 
@@ -396,9 +345,13 @@ public:
 
     serialLate movedUart;
 
-    
 
+    mpWindow* m_plot;
+    mpFXYVector* vectorLayer;
+    wxTextCtrl* m_log;
 
+    int wxgraphindex;
+    std::vector<double> XvectorwxGraph, YvectorwxGraph;
 
 private:
     void OnHello(wxCommandEvent& event);

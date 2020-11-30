@@ -4,7 +4,7 @@
 #include "eHandler.h"
 
 /* Event IDs */
-enum{
+enum {
     ID_Hello = 1,
     ID_View_SystemAnalysis = 2,
     ID_View_SystemOverview = 3,
@@ -12,7 +12,8 @@ enum{
     ID_Button_SO = 5,
 
     ID_Timer = 66,
-    TEXT_Main = 67
+    TEXT_Main = 67,
+    ID_GRAPH = 68
 };
 
 /* Event Table */
@@ -30,7 +31,60 @@ EVT_TIMER(ID_Timer, MyFrame::TimerCall)
 wxEND_EVENT_TABLE()
 
 
+void mpFXYVector::AddData(float x, float y, std::vector<double>& xs, std::vector<double>& ys)
+{
+    // Check if the data vectora are of the same size
+    if (xs.size() != ys.size()) {
+        wxLogError(_("wxMathPlot error: X and Y vector are not of the same length!"));
+        return;
+    }
 
+    //Delete first point if you need a filo buffer (i dont need it)
+    //xs.erase(xs.begin());
+    //xy.erase(xy.begin());
+
+    //Add new Data points at the end
+    xs.push_back(x);
+    ys.push_back(y);
+
+
+    // Copy the data:
+    m_xs = xs;
+    m_ys = ys;
+
+    // Update internal variables for the bounding box.
+    if (xs.size() > 0)
+    {
+        m_minX = xs[0];
+        m_maxX = xs[0];
+        m_minY = ys[0];
+        m_maxY = ys[0];
+
+        std::vector<double>::const_iterator  it;
+
+        for (it = xs.begin(); it != xs.end(); it++)
+        {
+            if (*it < m_minX) m_minX = *it;
+            if (*it > m_maxX) m_maxX = *it;
+        }
+        for (it = ys.begin(); it != ys.end(); it++)
+        {
+            if (*it < m_minY) m_minY = *it;
+            if (*it > m_maxY) m_maxY = *it;
+        }
+        m_minX -= 0.5f;
+        m_minY -= 0.5f;
+        m_maxX += 0.5f;
+        m_maxY += 0.5f;
+    }
+    else
+    {
+        m_minX = -1;
+        m_maxX = 1;
+        m_minY = -1;
+        m_maxY = 1;
+    }
+}
 
 
 /* System Analysis Panel Class */
@@ -302,6 +356,76 @@ MyFrame::MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size)
     //m_plot->Fit();
 
 
+    /* ------------------------------- NEED THIS VECTOR Layer FOR GRAPH ------------------------------- */
+
+    // Create a mpFXYVector layer
+    vectorLayer = new mpFXYVector(_("Vector"));
+
+    // Create two vectors for x,y and fill them with DEFAUL data
+    std::vector<double> vectorx, vectory;
+    double xcoord;
+    for (unsigned int p = 0; p < 100; p++) {
+        xcoord = ((double)p - 50.0) * 5.0;
+        vectorx.push_back(xcoord);
+        vectory.push_back(0.0001 * pow(xcoord, 3));
+    }
+    vectorLayer->SetData(vectorx, vectory);
+
+    /* Set Continuity of Vector Layer to Continuous */
+    vectorLayer->SetContinuity(true);
+
+    /* How to Actually Draw the Data */
+    wxPen vectorpen(*wxBLUE, 2, wxPENSTYLE_SOLID);
+    vectorLayer->SetPen(vectorpen);
+    vectorLayer->SetDrawOutsideMargins(false);
+
+
+    /* How GRAPH IS DRAWN ? */
+    wxFont graphFont(11, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
+    m_plot = new mpWindow(this, -1, wxPoint(0, 0), wxSize(100, 100), wxSUNKEN_BORDER);
+    mpScaleX* xaxis = new mpScaleX(wxT("X"), mpALIGN_BOTTOM, true, mpX_NORMAL);
+    mpScaleY* yaxis = new mpScaleY(wxT("Y"), mpALIGN_LEFT, true);
+    xaxis->SetFont(graphFont);
+    yaxis->SetFont(graphFont);
+    xaxis->SetDrawOutsideMargins(false);
+    yaxis->SetDrawOutsideMargins(false);
+
+    m_plot->SetMargins(30, 30, 50, 100);
+
+    m_plot->AddLayer(xaxis);
+    m_plot->AddLayer(yaxis);
+    m_plot->AddLayer(vectorLayer);
+
+    m_plot->AddLayer(new mpText(wxT("BOLT DATA GUI"), 10, 10));
+
+    wxBrush hatch(wxColour(200, 200, 200), wxBRUSHSTYLE_SOLID);
+    wxBrush hatch2(wxColour(163, 208, 212), wxBRUSHSTYLE_SOLID);
+
+    mpInfoLegend* leg;
+    m_plot->AddLayer(leg = new mpInfoLegend(wxRect(200, 20, 40, 40), wxTRANSPARENT_BRUSH)); //&hatch2));
+    leg->SetVisible(true);
+
+
+    wxPen mypen(*wxRED, 5, wxPENSTYLE_SOLID);
+
+    m_log = new wxTextCtrl(this, -1, wxT("This is the log window.\n"), wxPoint(0, 0), wxSize(100, 100), wxTE_MULTILINE);
+    wxLog* old_log = wxLog::SetActiveTarget(new wxLogTextCtrl(m_log));
+    delete old_log;
+
+    wxBoxSizer* topsizer = new wxBoxSizer(wxVERTICAL);
+
+    topsizer->Add(m_plot, 1, wxEXPAND);
+    topsizer->Add(m_log, 0, wxEXPAND);
+
+    SetAutoLayout(TRUE);
+    SetSizer(topsizer);
+
+
+    m_plot->EnableDoubleBuffer(true);
+    m_plot->SetMPScrollbars(false);
+    m_plot->Fit();
+
+    wxgraphindex = 100;
 }
 
 
@@ -351,6 +475,10 @@ void MyFrame::TimerCall(wxTimerEvent& event)
     movedUart.parseDataInArduino();
     movedUart.parseBoltData();
 
-    MainEditBox->WriteText(movedUart.BoltData);
-    MainEditBox->WriteText('\n');
+    //MainEditBox->WriteText(movedUart.BoltData);
+    //MainEditBox->WriteText('\n');
+
+    vectorLayer->AddData(wxgraphindex, movedUart.SOC, XvectorwxGraph, YvectorwxGraph);
+    m_plot->Fit();
+    wxgraphindex++;
 }

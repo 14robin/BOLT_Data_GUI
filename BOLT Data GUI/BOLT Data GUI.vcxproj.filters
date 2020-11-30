@@ -27,13 +27,10 @@
     <ClInclude Include="eHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="portCommuniction.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\asio_Lib\asio-1.18.0\include\asio.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\Desktop\20_Fall\ECE 4974 - Independant Study\wxMathPlot-0.1.2\mathplot.h">
+    <ClInclude Include="mathplot.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -44,10 +41,7 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="portCommunication.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\Desktop\20_Fall\ECE 4974 - Independant Study\wxMathPlot-0.1.2\mathplot.cpp">
+    <ClCompile Include="mathplot.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
