@@ -143,6 +143,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\..\Desktop\20_Fall\ECE 4974 - Independant Study\wxMathPlot-0.1.2\mathplot.h" />
     <ClInclude Include="..\..\asio_Lib\asio-1.18.0\include\asio.hpp" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="eHandler.h" />
@@ -151,6 +152,7 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\..\Desktop\20_Fall\ECE 4974 - Independant Study\wxMathPlot-0.1.2\mathplot.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="eHandler.cpp" />
     <ClCompile Include="portCommunication.cpp" />

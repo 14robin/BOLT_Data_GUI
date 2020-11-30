@@ -212,6 +212,8 @@ MyFrame::MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size)
     wxTimer* m_timer = new wxTimer(this, ID_Timer);
     m_timer->Start(600);
 
+
+
     /* Create System Analysis Panel*/
     p_SystemAnalysisPanel = new SystemAnalysisPanel(this);
     p_SystemAnalysisPanel->Show(true);
@@ -294,6 +296,12 @@ MyFrame::MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size)
 
     //xBee.OnUserDestroy();
 
+    //wxMathPlot* m_Vector = new wxMathPlot(\);
+
+    //m_Vector->AddData(xPos, yPos, vectorX, vectorY);
+    //m_plot->Fit();
+
+
 }
 
 
@@ -341,8 +349,8 @@ void MyFrame::TimerCall(wxTimerEvent& event)
     //movedUart.parseDataIn();
 
     movedUart.parseDataInArduino();
+    movedUart.parseBoltData();
 
-
-    MainEditBox->WriteText(movedUart.dataIn);
+    MainEditBox->WriteText(movedUart.BoltData);
     MainEditBox->WriteText('\n');
 }
