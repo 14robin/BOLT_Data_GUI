@@ -23,266 +23,285 @@
 
 
 
+/* Struct to Organize and Track Bolt IV Data */
+struct BoltIVdata
+{
+    int SOC, FPV, highTemp, lowTemp, highVoltage, lowVoltage, RPM, motorTemp, dcBusCurrent, motorTorque, motorCtrlTemp;
+    int auxVoltage, xAcc, yAcc, zAcc, xGyro, yGyro, zGyro, roll, pitch;
+};
+
+/* Struct to Organize and Track Bolt IV Data */
+struct BoltIVdataVectors
+{
+    std::vector<double> SOC, FPV, highTemp, lowTemp, highVoltage, lowVoltage, RPM, motorTemp, dcBusCurrent, motorTorque, motorCtrlTemp;
+    std::vector<double> auxVoltage, xAcc, yAcc, zAcc, xGyro, yGyro, zGyro, roll, pitch;
+};
 
 
-
-
-
-
-
-
-
-class serialLate
+/* Class to Interface with Computer Port */
+class portClass
 {
 public:
 
-    // Data Varibales for BOLT IV Data
-    int SOC, FPV, highTemp, lowTemp, highVoltage, lowVoltage, RPM, motorTemp, dcBusCurrent, motorTorque, motorCtrlTemp;
-    int auxVoltage, xAcc, yAcc, zAcc, xGyro, yGyro, zGyro, roll, pitch;
+    /* Initialize Structure for Bolt IV Data */
+    BoltIVdata BoltIV;
 
+    /* Low Level Port Variables */
+    asio::io_context context;
+    std::thread thrContext;
+    std::unique_ptr<asio::serial_port> port_handle;
 
-    char dataIn[165];
-    char startDelimiter = 0x7e;
-    char endDelimiter = 0x5e;
+    /* High Level Port Variables */
     char nIncomingByte;
+    char dataIn[165];
+    char dataInFormated[165];
+    char startDelimiter;
+    char endDelimiter;
     int dataInIndex;
     bool dataInRead;
 
 
-    /* Other Data */
-    char BoltData[256];
+    // Use for Xbee Transmission - NOT ARDUINO
+    //void parseDataIn()
+    //{
+    //    for (int k = 0; k < 148; k++)
+    //    {
+    //        if (dataIn[k + 17] == '\0')
+    //            BoltData[k] = '0';
+    //        else
+    //            BoltData[k] = dataIn[k + 17];
+    //    }
+    //}
 
-    asio::io_context context;
-    std::thread thrContext;
-    std::unique_ptr<asio::serial_port> portX;
 
-    void parseDataIn()
-    {
-        for (int k = 0; k < 148; k++)
-        {
-            if (dataIn[k + 17] == '\0')
-                BoltData[k] = '0';
-            else
-                BoltData[k] = dataIn[k + 17];
-        }
-    }
-
-    void parseDataInArduino()
+    /* ARDUINO - Convert Incomming String to xBee Transmission */
+    void formatInputString()
     {
         int offset = 0;
         int track = 0;
 
         for (int k = 0; k < 99; k++)
         {
-            BoltData[k] = dataIn[k - offset + 1];
+            dataInFormated[k] = dataIn[k - offset + 1];
             
             track++;
             if (track == 5)
             {
-                BoltData[k] = ',';
+                dataInFormated[k] = ',';
                 offset++;
                 track = 0;
             }
         }
     }
 
-    void parseBoltData()
+    /* Update the Bolt IV Struct Variables with the Latest Recieved Data */
+    void refreshBoltIVdata()
     {
         char hold[4];
         int holdindex = 0;
 
         holdindex = 0;
-        for (int k = 0; k < 4; k++)         // SOC
+        for (int k = 0; k < 4; k++)             // SOC
         {
-            hold[holdindex] = BoltData[k];
+            hold[holdindex] = dataInFormated[k];
             holdindex++;
         }
-        SOC = atoi(hold);
+        BoltIV.SOC = atoi(hold);
 
         holdindex = 0;
-        for (int k = 5; k < 9; k++)         // FPV
+        for (int k = 5; k < 9; k++)             // FPV
         {
-            hold[holdindex] = BoltData[k];
+            hold[holdindex] = dataInFormated[k];
             holdindex++;
         }
-        FPV = atoi(hold);
+        BoltIV.FPV = atoi(hold);
 
         holdindex = 0;
-        for (int k = 10; k < 14; k++)         // highTemp
+        for (int k = 10; k < 14; k++)           // highTemp
         {
-            hold[holdindex] = BoltData[k];
+            hold[holdindex] = dataInFormated[k];
             holdindex++;
         }
-        highTemp = atoi(hold);
+        BoltIV.highTemp = atoi(hold);
 
         holdindex = 0;
-        for (int k = 15; k < 19; k++)         // lowTemp
+        for (int k = 15; k < 19; k++)           // lowTemp
         {
-            hold[holdindex] = BoltData[k];
+            hold[holdindex] = dataInFormated[k];
             holdindex++;
         }
-        lowTemp = atoi(hold);
+        BoltIV.lowTemp = atoi(hold);
 
         holdindex = 0;
-        for (int k = 20; k < 24; k++)         // highVoltage
+        for (int k = 20; k < 24; k++)           // highVoltage
         {
-            hold[holdindex] = BoltData[k];
+            hold[holdindex] = dataInFormated[k];
             holdindex++;
         }
-        highVoltage = atoi(hold);
+        BoltIV.highVoltage = atoi(hold);
 
         holdindex = 0;
-        for (int k = 25; k < 29; k++)         // lowVoltage
+        for (int k = 25; k < 29; k++)           // lowVoltage
         {
-            hold[holdindex] = BoltData[k];
+            hold[holdindex] = dataInFormated[k];
             holdindex++;
         }
-        lowVoltage = atoi(hold);
+        BoltIV.lowVoltage = atoi(hold);
 
         holdindex = 0;
-        for (int k = 30; k < 34; k++)         // RPM
+        for (int k = 30; k < 34; k++)           // RPM
         {
-            hold[holdindex] = BoltData[k];
+            hold[holdindex] = dataInFormated[k];
             holdindex++;
         }
-        RPM = atoi(hold);
+        BoltIV.RPM = atoi(hold);
 
         holdindex = 0;
-        for (int k = 35; k < 39; k++)         // motorTemp
+        for (int k = 35; k < 39; k++)           // motorTemp
         {
-            hold[holdindex] = BoltData[k];
+            hold[holdindex] = dataInFormated[k];
             holdindex++;
         }
-        motorTemp = atoi(hold);
+        BoltIV.motorTemp = atoi(hold);
 
         holdindex = 0;
-        for (int k = 40; k < 44; k++)         // dcBusCurrent
+        for (int k = 40; k < 44; k++)           // dcBusCurrent
         {
-            hold[holdindex] = BoltData[k];
+            hold[holdindex] = dataInFormated[k];
             holdindex++;
         }
-        dcBusCurrent = atoi(hold);
+        BoltIV.dcBusCurrent = atoi(hold);
 
         holdindex = 0;
-        for (int k = 45; k < 49; k++)         // motorTorque
+        for (int k = 45; k < 49; k++)           // motorTorque
         {
-            hold[holdindex] = BoltData[k];
+            hold[holdindex] = dataInFormated[k];
             holdindex++;
         }
-        motorTorque = atoi(hold);
+        BoltIV.motorTorque = atoi(hold);
 
         holdindex = 0;
-        for (int k = 50; k < 54; k++)         // motorCtrlTemp
+        for (int k = 50; k < 54; k++)           // motorCtrlTemp
         {
-            hold[holdindex] = BoltData[k];
+            hold[holdindex] = dataInFormated[k];
             holdindex++;
         }
-        motorCtrlTemp = atoi(hold);
+        BoltIV.motorCtrlTemp = atoi(hold);
 
         holdindex = 0;
-        for (int k = 55; k < 59; k++)         // auxVoltage
+        for (int k = 55; k < 59; k++)           // auxVoltage
         {
-            hold[holdindex] = BoltData[k];
+            hold[holdindex] = dataInFormated[k];
             holdindex++;
         }
-        auxVoltage = atoi(hold);
+        BoltIV.auxVoltage = atoi(hold);
 
         holdindex = 0;
-        for (int k = 60; k < 64; k++)         // xAcc
+        for (int k = 60; k < 64; k++)           // xAcc
         {
-            hold[holdindex] = BoltData[k];
+            hold[holdindex] = dataInFormated[k];
             holdindex++;
         }
-        xAcc = atoi(hold);
+        BoltIV.xAcc = atoi(hold);
 
         holdindex = 0;
-        for (int k = 65; k < 69; k++)         // yAcc
+        for (int k = 65; k < 69; k++)           // yAcc
         {
-            hold[holdindex] = BoltData[k];
+            hold[holdindex] = dataInFormated[k];
             holdindex++;
         }
-        yAcc = atoi(hold);
+        BoltIV.yAcc = atoi(hold);
 
         holdindex = 0;
-        for (int k = 70; k < 74; k++)         // zAcc
+        for (int k = 70; k < 74; k++)           // zAcc
         {
-            hold[holdindex] = BoltData[k];
+            hold[holdindex] = dataInFormated[k];
             holdindex++;
         }
-        zAcc = atoi(hold);
+        BoltIV.zAcc = atoi(hold);
 
         holdindex = 0;
-        for (int k = 75; k < 79; k++)         // xGyro
+        for (int k = 75; k < 79; k++)           // xGyro
         {
-            hold[holdindex] = BoltData[k];
+            hold[holdindex] = dataInFormated[k];
             holdindex++;
         }
-        xGyro = atoi(hold);
+        BoltIV.xGyro = atoi(hold);
 
         holdindex = 0;
-        for (int k = 80; k < 84; k++)         // yGyro
+        for (int k = 80; k < 84; k++)           // yGyro
         {
-            hold[holdindex] = BoltData[k];
+            hold[holdindex] = dataInFormated[k];
             holdindex++;
         }
-        yGyro = atoi(hold);
+        BoltIV.yGyro = atoi(hold);
 
         holdindex = 0;
-        for (int k = 85; k < 89; k++)         // zGyro
+        for (int k = 85; k < 89; k++)           // zGyro
         {
-            hold[holdindex] = BoltData[k];
+            hold[holdindex] = dataInFormated[k];
             holdindex++;
         }
-        zGyro = atoi(hold);
+        BoltIV.zGyro = atoi(hold);
 
         holdindex = 0;
-        for (int k = 90; k < 94; k++)         // roll
+        for (int k = 90; k < 94; k++)           // roll
         {
-            hold[holdindex] = BoltData[k];
+            hold[holdindex] = dataInFormated[k];
             holdindex++;
         }
-        roll = atoi(hold);
+        BoltIV.roll = atoi(hold);
 
         holdindex = 0;
-        for (int k = 95; k < 99; k++)         // pitch
+        for (int k = 95; k < 99; k++)           // pitch
         {
-            hold[holdindex] = BoltData[k];
+            hold[holdindex] = dataInFormated[k];
             holdindex++;
         }
-        pitch = atoi(hold);
+        BoltIV.pitch = atoi(hold);
     }
 
-    bool OnUserCreate()
+
+    /* Default Constructor */
+    bool CreatePort()
     {
-
-        portX.reset(new asio::serial_port(context));
+        /* Initialize Port */
+        port_handle.reset(new asio::serial_port(context));
         asio::error_code ec;
-        portX->open("COM7", ec);
+        port_handle->open("COM7", ec);
 
-        if (portX->is_open())
-        {
-            wxLogMessage("Bolt Port Open");
-        }
+        /* Signal if Port is Open */
+        if (port_handle->is_open())
+            wxLogMessage("Port is Now Open");
+        else
+            return false;
 
-        portX->set_option(asio::serial_port::baud_rate(57600));
-        portX->set_option(asio::serial_port_base::character_size());
-        portX->set_option(asio::serial_port_base::stop_bits());
-        portX->set_option(asio::serial_port_base::parity());
-        portX->set_option(asio::serial_port_base::flow_control());
+        /* Set Port Parameters */
+        port_handle->set_option(asio::serial_port::baud_rate(57600));
+        port_handle->set_option(asio::serial_port_base::character_size());
+        port_handle->set_option(asio::serial_port_base::stop_bits());
+        port_handle->set_option(asio::serial_port_base::parity());
+        port_handle->set_option(asio::serial_port_base::flow_control());
 
-        
+        /* Initialize Read Variables */
+        dataInIndex     = 0;
+        dataInRead      = false;
+        startDelimiter  = 0x7e;
+        endDelimiter    = 0x5e;
 
-        dataInIndex = 0;
-        dataInRead = false;
-        aRead();
+        /* Prime the Read Function */
+        portRead();
         thrContext = std::thread([&]() {context.run(); });
 
+        /* Return */
         return true;
     }
 
-    void aRead()
+
+    /* Asynchronous Port Read Function */
+    void portRead()
     {
-        portX->async_read_some(asio::buffer(&nIncomingByte, 1),
+        port_handle->async_read_some(asio::buffer(&nIncomingByte, 1),
             [this](std::error_code ec, std::size_t length)
             {
                 /* If No Error */
@@ -302,26 +321,28 @@ public:
                             dataInIndex++;
                         }
 
-                        /* End of Data Transmission BASED on LENGTH */
-                        if (nIncomingByte == endDelimiter) // 164 for xBee Data Transmission
+                        /* If Incomming Byte Signals End of Data Transmission */
+                        if (nIncomingByte == endDelimiter)
                         {
                             dataInRead = false;
                             dataInIndex = 0;
                         }
                     }
 
-                    /* Set Next Read Function */
-                    aRead();
+                    /* Prime Next Read Function */
+                    portRead();
                 } 
             });
     }
 
-    bool OnUserDestroy()
+
+    /* Default Destructor */
+    bool DeletePort()
     {
-        if (portX)
+        if (port_handle)
         {
-            portX->cancel();
-            portX->close();
+            port_handle->cancel();
+            port_handle->close();
         }
 
         if (thrContext.joinable())
@@ -329,41 +350,51 @@ public:
             thrContext.join();
         }
 
-        portX.reset();
+        port_handle.reset();
 
         return true;
     }
-
 };
 
+
+/* Main Application Frame Class */
 class MyFrame : public wxFrame
 {
 public:
+
+    /* Default Constructor */
     MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size);
+
+    /* Port Varible */
+    portClass xBee;
+
+    /* Display Pointers */
     wxTextCtrl* MainEditBox;
-
-
-    serialLate movedUart;
-
-
     mpWindow* m_plot;
     mpFXYVector* vectorLayer;
     wxTextCtrl* m_log;
 
-    int wxgraphindex;
-    std::vector<double> XvectorwxGraph, YvectorwxGraph;
+    /* Data Members Needed To Plot Bolt IV Data */
+    int xAxisValue;
+    std::vector<double> xAxisVector;
+    BoltIVdataVectors yAxisVector;
 
 private:
+
+    /* Call On User Event */
     void OnHello(wxCommandEvent& event);
     void OnExit(wxCommandEvent& event);
     void OnAbout(wxCommandEvent& event);
     void OnViewSA(wxCommandEvent& event);
     void OnViewSO(wxCommandEvent& event);
 
+    /* Call on Timer Event */
     void TimerCall(wxTimerEvent& event);
 
-    //Port xBee;
-    wxPanel* p_SystemAnalysisPanel;
-
+    /* Initialize the Event Table Used */
     wxDECLARE_EVENT_TABLE();
+
+  
+    // Delete ?
+    wxPanel* p_SystemAnalysisPanel;
 };

@@ -21,6 +21,7 @@ public:
     virtual bool OnInit();
 };
 
+
 /* Open Application */
 wxIMPLEMENT_APP(MyApp);
 
