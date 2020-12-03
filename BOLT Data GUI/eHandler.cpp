@@ -90,134 +90,6 @@ void mpFXYVector::AddData(float xVal, float yVal, std::vector<double>& xVector, 
 }
 
 
-///* System Analysis Panel Class */
-//class SystemAnalysisPanel : public wxPanel
-//{
-//public:
-//    /* Default Constructor */
-//    SystemAnalysisPanel(wxWindow* parent);
-//
-//private:
-//    /* Variables for System Analysis Panel */
-//
-//};
-//
-///* Default Constructor */
-//SystemAnalysisPanel::SystemAnalysisPanel(wxWindow * parent): wxPanel(parent, wxID_ANY)
-//{
-//    SetBackgroundColour(wxColor(*wxBLUE));
-//
-//
-//    ///* Initialize Communication Port */
-//    //HANDLE hComm;
-//    //LPCWSTR a = L"COM7";
-//    //hComm = CreateFile(a, GENERIC_READ, 0, NULL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, NULL);
-//
-//
-//    ///* Check if Port is Open */
-//    //if (hComm == INVALID_HANDLE_VALUE)
-//    //    wxLogMessage("Error in opening serial port");
-//    //else
-//    //    wxLogMessage("opening serial port successful"); 
-//
-//
-//    ///* Initialize DCB Structure */
-//    //DCB dcbSerialParams = { 0 };
-//    //dcbSerialParams.DCBlength = sizeof(dcbSerialParams);
-//
-//    //GetCommState(hComm, &dcbSerialParams);
-//
-//    //dcbSerialParams.BaudRate = CBR_9600;    // Setting BaudRate = 9600
-//    //dcbSerialParams.ByteSize = 8;           // Setting ByteSize = 8
-//    //dcbSerialParams.StopBits = ONESTOPBIT;  // Setting StopBits = 1
-//    //dcbSerialParams.Parity = NOPARITY;      // Setting Parity = None
-//
-//    //SetCommState(hComm, &dcbSerialParams);
-//
-//
-//
-//    ///* Create an Event - Recieve Character */
-//    //SetCommMask(hComm, EV_RXCHAR);
-//
-//
-//    ///* Windows will WAIT for Event to Happen - Then Continue ? */
-//    //DWORD dwEventMask;
-//    //WaitCommEvent(hComm, &dwEventMask, NULL);
-//
-//
-//
-//    //char TempChar;                              //Temporary character used for reading
-//    //char SerialBuffer[256];                     //Buffer for storing Rxed Data
-//    //DWORD NoBytesRead;
-//    //int i = 0;                                  // Increment Position of Incoming Data
-//
-//    //COMMTIMEOUTS timeouts = { 0 };
-//    //timeouts.ReadTotalTimeoutConstant = 100;
-//
-//    ///* Continuous Execution B/C UART is ALWAYS Transmitting */
-//    //do
-//    //{
-//    //    ReadFile(hComm,           //Handle of the Serial port
-//    //        &TempChar,       //Temporary character
-//    //        sizeof(TempChar),//Size of TempChar
-//    //        &NoBytesRead,    //Number of bytes read
-//    //        NULL);
-//
-//    //    SerialBuffer[i] = TempChar;// Store Tempchar into buffer
-//    //    i++;
-//    //}
-//    //while (TempChar != 'x');
-//
-//    //char SerialBufferCopy[256];
-//    //for (int k = 0; k < i; k++)
-//    //    SerialBufferCopy[k] = SerialBuffer[k];
-//
-//    //wxLogMessage(SerialBufferCopy);
-//
-//
-//    //CloseHandle(hComm);//Closing the Serial Port
-//
-//
-//    //Port xBee;
-//    //xBee.Read();
-//    //xBee.Read();
-//    //xBee.Read();
-//    //xBee.closePort();
-//
-//
-//    //static const int INTERVAL = 300; // milliseconds
-//
-//
-//
-//    
-//    //wxFFileOutputStream output(stderr);
-//    //wxTextOutputStream cout(output);
-//    //cout << "This is a text line" << endl;
-//    //cout << 1234;
-//    //cout << 1.23456;
-//
-//    
-//
-//
-//    //wxPanel* p_Panel = new wxPanel(parent, wxID_ANY);
-//    //wxBoxSizer* p_Box = new wxBoxSizer(wxVERTICAL);
-//    //TopPanel* p_Tpanel = new TopPanel(p_Panel);
-//    //BottomPanel* p_Bpanel = new BottomPanel(p_Panel);
-//
-//    //p_Box->Add(p_Tpanel, 1, wxEXPAND | wxALL, 5);
-//    //p_Box->Add(p_Bpanel, 1, wxEXPAND | wxALL, 5);
-//
-//    //p_Panel->SetSizer(p_Box);
-//
-//    //this->Centre();
-//}
-
-
-
-
-
-
-
 
 
 
@@ -225,11 +97,6 @@ void mpFXYVector::AddData(float xVal, float yVal, std::vector<double>& xVector, 
 MyFrame::MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size)
     : wxFrame(NULL, wxID_ANY, title, pos, size)
 {
-    ///* Create Serial Port Connection */
-    //xBee.CreatePort();
-
-
-
     // Frame 
     wxSize minSize(500, 500);
     SetMinSize(minSize);
@@ -263,9 +130,6 @@ MyFrame::MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size)
     CreateStatusBar();
     SetStatusText("Welcome to wxWidgets!");
 
-    ///* Timer Used to Refresh Plot Data */
-    //wxTimer* m_timer = new wxTimer(this, ID_Timer);
-    //m_timer->Start(600);
 
 
     /* ------------------------------- Graph Data ------------------------------- */
