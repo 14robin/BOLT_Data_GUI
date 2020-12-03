@@ -253,8 +253,8 @@ MyFrame::MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size)
 
     /* NEW MENU ITEM - VIEW */
     wxMenu* menuView = new wxMenu;
-    menuView->Append(ID_View_SystemAnalysis, "&System Analysis", "View System Analysis");
-    menuView->Append(ID_View_SystemOverview, "&System Overview", "View System Overview");
+    menuView->Append(ID_View_SystemAnalysis, "&Close Serial Port Connection", "Close Serial Port Connection");
+    menuView->Append(ID_View_SystemOverview, "&Open Serial Port Conection", "Open Serial Port Connection");
     menuBar->Append(menuView, "&View");
 
     SetMenuBar(menuBar);
@@ -573,13 +573,16 @@ MyFrame::MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size)
     wxBoxSizer* mainsizer = new wxBoxSizer(wxHORIZONTAL);
     leftSizer = new wxBoxSizer(wxVERTICAL);
     rightSizer = new wxBoxSizer(wxVERTICAL);
+    farleftSizer = new wxBoxSizer(wxVERTICAL);
+    farrightSizer = new wxBoxSizer(wxVERTICAL);
 
     /* Format Plot Space 2x10 */
-    leftSizer->Add(m_plot, 1, wxEXPAND);
-    leftSizer->Add(m_plot1, 1, wxEXPAND);
-    leftSizer->Add(m_plot2, 1, wxEXPAND);
-    leftSizer->Add(m_plot3, 1, wxEXPAND);
-    leftSizer->Add(m_plot4, 1, wxEXPAND);
+    farleftSizer->Add(m_plot, 1, wxEXPAND);
+    farleftSizer->Add(m_plot1, 1, wxEXPAND);
+    farleftSizer->Add(m_plot2, 1, wxEXPAND);
+    farleftSizer->Add(m_plot3, 1, wxEXPAND);
+    farleftSizer->Add(m_plot4, 1, wxEXPAND);
+
     leftSizer->Add(m_plot5, 1, wxEXPAND);
     leftSizer->Add(m_plot6, 1, wxEXPAND);
     leftSizer->Add(m_plot7, 1, wxEXPAND);
@@ -591,14 +594,17 @@ MyFrame::MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size)
     rightSizer->Add(m_plot12, 1, wxEXPAND);
     rightSizer->Add(m_plot13, 1, wxEXPAND);
     rightSizer->Add(m_plot14, 1, wxEXPAND);
-    rightSizer->Add(m_plot15, 1, wxEXPAND);
-    rightSizer->Add(m_plot16, 1, wxEXPAND);
-    rightSizer->Add(m_plot17, 1, wxEXPAND);
-    rightSizer->Add(m_plot18, 1, wxEXPAND);
-    rightSizer->Add(m_plot19, 1, wxEXPAND);
 
+    farrightSizer->Add(m_plot15, 1, wxEXPAND);
+    farrightSizer->Add(m_plot16, 1, wxEXPAND);
+    farrightSizer->Add(m_plot17, 1, wxEXPAND);
+    farrightSizer->Add(m_plot18, 1, wxEXPAND);
+    farrightSizer->Add(m_plot19, 1, wxEXPAND);
+
+    mainsizer->Add(farleftSizer, 1, wxEXPAND);
     mainsizer->Add(leftSizer, 1, wxEXPAND);
     mainsizer->Add(rightSizer, 1, wxEXPAND);
+    mainsizer->Add(farrightSizer, 1, wxEXPAND);
 
     /* Display Plot Sizers */
     SetAutoLayout(TRUE);
@@ -636,7 +642,9 @@ void MyFrame::OnHello(wxCommandEvent& event)
 /* EVENT HANDLER - SYSTEM ANALYSIS */
 void MyFrame::OnViewSA(wxCommandEvent& event)
 {
-    wxLogMessage("Bolt Port Closed");
+    xBee.DeletePort();
+    m_timer->Stop();
+    wxLogMessage("Port is Now Closed");
 }
 
 /* EVENT HANDLER - SYSTEM OVERVIEW */
@@ -644,7 +652,7 @@ void MyFrame::OnViewSO(wxCommandEvent& event)
 {
     /* Create Plotting Event */
     xBee.CreatePort();
-    wxTimer* m_timer = new wxTimer(this, ID_Timer);
+    m_timer = new wxTimer(this, ID_Timer);
     m_timer->Start(600);
 }
 

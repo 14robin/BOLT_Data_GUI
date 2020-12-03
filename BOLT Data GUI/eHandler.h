@@ -376,6 +376,9 @@ public:
 
     wxBoxSizer* leftSizer;
     wxBoxSizer* rightSizer;
+    wxBoxSizer* farleftSizer;
+    wxBoxSizer* farrightSizer;
+    wxTimer* m_timer;
 
     /* Data Members Needed To Plot Bolt IV Data */
     int xAxisValue;
