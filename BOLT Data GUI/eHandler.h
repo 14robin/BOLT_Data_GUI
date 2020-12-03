@@ -370,13 +370,16 @@ public:
 
     /* Display Pointers */
     wxTextCtrl* MainEditBox;
-    mpWindow* m_plot;
-    mpFXYVector* vectorLayer;
-    wxTextCtrl* m_log;
+
+    mpWindow *m_plot, *m_plot1, * m_plot2, * m_plot3, * m_plot4, * m_plot5, * m_plot6, * m_plot7, * m_plot8, * m_plot9, * m_plot10, * m_plot11, * m_plot12, * m_plot13, * m_plot14, * m_plot15, * m_plot16, * m_plot17, * m_plot18, * m_plot19;
+    mpFXYVector* vectorLayer, * vectorLayer1, *vectorLayer2, * vectorLayer3, * vectorLayer4, * vectorLayer5, * vectorLayer6, * vectorLayer7, * vectorLayer8, * vectorLayer9, * vectorLayer10, * vectorLayer11, * vectorLayer12, * vectorLayer13, * vectorLayer14, * vectorLayer15, * vectorLayer16, * vectorLayer17, * vectorLayer18, * vectorLayer19;
+
+    wxBoxSizer* leftSizer;
+    wxBoxSizer* rightSizer;
 
     /* Data Members Needed To Plot Bolt IV Data */
     int xAxisValue;
-    std::vector<double> xAxisVector;
+    BoltIVdataVectors xAxisVector;
     BoltIVdataVectors yAxisVector;
 
 private:

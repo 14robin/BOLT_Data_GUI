@@ -43,6 +43,14 @@ void mpFXYVector::AddData(float xVal, float yVal, std::vector<double>& xVector, 
     xVector.push_back(xVal);
     yVector.push_back(yVal);
 
+
+    // If Vector Gets too Large Only Plot past 25s
+    if (xVector.size() > 50)
+    {
+        xVector.erase(xVector.begin());
+        yVector.erase(yVector.begin());
+    }
+
     /* Write New Vectors to Class Data Structure */
     m_xs = xVector;
     m_ys = yVector;
@@ -217,8 +225,8 @@ void mpFXYVector::AddData(float xVal, float yVal, std::vector<double>& xVector, 
 MyFrame::MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size)
     : wxFrame(NULL, wxID_ANY, title, pos, size)
 {
-    /* Create Serial Port Connection */
-    xBee.CreatePort();
+    ///* Create Serial Port Connection */
+    //xBee.CreatePort();
 
 
 
@@ -255,170 +263,350 @@ MyFrame::MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size)
     CreateStatusBar();
     SetStatusText("Welcome to wxWidgets!");
 
-    /* Timer Used to Refresh Plot Data */
-    wxTimer* m_timer = new wxTimer(this, ID_Timer);
-    m_timer->Start(600);
+    ///* Timer Used to Refresh Plot Data */
+    //wxTimer* m_timer = new wxTimer(this, ID_Timer);
+    //m_timer->Start(600);
 
 
-
-    /* Create System Analysis Panel*/
-    //p_SystemAnalysisPanel = new SystemAnalysisPanel(this);
-    //p_SystemAnalysisPanel->Show(true);
+    /* ------------------------------- Graph Data ------------------------------- */
 
 
-    //MainEditBox = new wxTextCtrl(this, TEXT_Main, "<<-- Data ", wxDefaultPosition, wxSize(1150, 550),
-    //    wxTE_MULTILINE | wxTE_RICH, wxDefaultValidator, wxTextCtrlNameStr);
-
-
-    //MainEditBox->WriteText(xBee.dataIn);
-    //MainEditBox->WriteText('\n');
-
-    //MainEditBox->WriteText(xBee.dataIn);
-    //MainEditBox->WriteText('\n');
-
-
-
-
-    //asio::io_service io;
-    //asio::serial_port xBee(io, "COM5");
-
-    //if (xBee.is_open())
-    //    wxLogMessage("FUCK YES NOW JUST READ DATA");
-
-
-    //xBee.set_option(asio::serial_port::baud_rate(57600));
-
-    //xBee.set_option(asio::serial_port_base::character_size());
-    //xBee.set_option(asio::serial_port_base::stop_bits());
-    //xBee.set_option(asio::serial_port_base::parity());
-    //xBee.set_option(asio::serial_port_base::flow_control());
-
-    //char nIncomingByte;
-    //xBee.async_read_some(asio::buffer(&nIncomingByte, 1))
-    //   
-    //xBee.set_option(asio::serial_port_base::parity(PARITY_NONE));
-    //xBee.set_option(asio::serial_port_base::baud_rate(BAUD_57600));
-    //xBee.set_option(DATABITS_8);
-
-    //asio::async_read(xBee, asio::buffer(m_read_message.data(), m_read_message.m_header_length), [this](asio::error_code& ec, std::size_t /*length*/)
-
-    //for (;;)
-    //{
-    //    // get a string from the user, sentiel is exit
-    //    std::string input;
-    //    char data[512];
-
-    //    // read bytes from the serial port
-    //    // asio::read will read bytes until the buffer is filled
-    //    size_t nread = asio::read(
-    //        xBee, asio::buffer(data, input.length())
-    //    );
-
-    //    std::string message(data, nread);
-
-    //    char printxBee[512];
-    //    for (int k = 0; k < message.size(); k++)
-    //        printxBee[k] = message[k];
-    //    wxLogMessage(printxBee);
-    //}
-
-
-
-    //char data[256];
-    //std::string input;
-
-    //size_t nread = asio::read(
-    //    xBee, asio::buffer(data, input.length())
-    //);
-
-    //std::string message(data, nread);
-
-
-
-
-    //xBee.close();
-
-
-
-
-    //xBee.OnUserDestroy();
-
-    //wxMathPlot* m_Vector = new wxMathPlot(\);
-
-    //m_Vector->AddData(xPos, yPos, vectorX, vectorY);
-    //m_plot->Fit();
-
-
-    /* ------------------------------- NEED THIS VECTOR Layer FOR GRAPH ------------------------------- */
-
-    // Create a mpFXYVector layer
-    vectorLayer = new mpFXYVector(_("Vector"));
-
-    // Create two vectors for x,y and fill them with DEFAULT data
-    std::vector<double> vectorx, vectory;
-    double xcoord;
-    for (unsigned int p = 0; p < 100; p++) {
-        xcoord = ((double)p - 50.0) * 5.0;
-        vectorx.push_back(xcoord);
-        vectory.push_back(0.0001 * pow(xcoord, 3));
-    }
-    vectorLayer->SetData(vectorx, vectory);
-
-    /* Set Continuity of Vector Layer to Continuous */
-    vectorLayer->SetContinuity(true);
-
-    /* How to Actually Draw the Data */
-    wxPen vectorpen(*wxBLUE, 2, wxPENSTYLE_SOLID);
-    vectorLayer->SetPen(vectorpen);
-    vectorLayer->SetDrawOutsideMargins(false);
-
-
-    /* How GRAPH IS DRAWN ? */
-    wxFont graphFont(11, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
-    m_plot = new mpWindow(this, -1, wxPoint(0, 0), wxSize(100, 100), wxSUNKEN_BORDER);
-    mpScaleX* xaxis = new mpScaleX(wxT("X"), mpALIGN_BOTTOM, true, mpX_NORMAL);
-    mpScaleY* yaxis = new mpScaleY(wxT("Y"), mpALIGN_LEFT, true);
+    /* Graph Axis */
+    mpScaleX* xaxis = new mpScaleX(wxT("Time"), mpALIGN_BOTTOM || mpALIGN_LEFT, false, mpX_TIME);
+    mpScaleY* yaxis = new mpScaleY(wxT("Value(units)"), mpALIGN_LEFT, true);
+    wxFont graphFont(9, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
     xaxis->SetFont(graphFont);
     yaxis->SetFont(graphFont);
     xaxis->SetDrawOutsideMargins(false);
     yaxis->SetDrawOutsideMargins(false);
 
-    m_plot->SetMargins(30, 30, 50, 100);
 
+    // vectorLayer
+    vectorLayer = new mpFXYVector(_("SOC"));
+    vectorLayer->SetContinuity(true);
+    wxPen vectorpen(*wxBLUE, 2, wxPENSTYLE_SOLID);
+    vectorLayer->SetPen(vectorpen);
+    vectorLayer->SetDrawOutsideMargins(false);
+
+    /* m_plot */
+    m_plot = new mpWindow(this, -1, wxPoint(0, 0), wxSize(100, 100), wxSUNKEN_BORDER);
+    m_plot->SetMargins(20, 40, 40, 80);
     m_plot->AddLayer(xaxis);
     m_plot->AddLayer(yaxis);
     m_plot->AddLayer(vectorLayer);
+    m_plot->AddLayer(new mpText(wxT("SOC"), 30, 5));
 
-    m_plot->AddLayer(new mpText(wxT("BOLT DATA GUI"), 10, 10));
+    // vectorLayer
+    vectorLayer1 = new mpFXYVector(_("FPV"));
+    vectorLayer1->SetContinuity(true);
+    vectorLayer1->SetPen(vectorpen);
+    vectorLayer1->SetDrawOutsideMargins(false);
 
-    wxBrush hatch(wxColour(200, 200, 200), wxBRUSHSTYLE_SOLID);
-    wxBrush hatch2(wxColour(163, 208, 212), wxBRUSHSTYLE_SOLID);
+    /* m_plot */
+    m_plot1 = new mpWindow(this, -1, wxPoint(0, 0), wxSize(100, 100), wxSUNKEN_BORDER);
+    m_plot1->SetMargins(20, 40, 40, 85);
+    m_plot1->AddLayer(xaxis);
+    m_plot1->AddLayer(yaxis);
+    m_plot1->AddLayer(vectorLayer1);
+    m_plot1->AddLayer(new mpText(wxT("FPV"), 30, 5));
 
-    mpInfoLegend* leg;
-    m_plot->AddLayer(leg = new mpInfoLegend(wxRect(200, 20, 40, 40), wxTRANSPARENT_BRUSH)); //&hatch2));
-    leg->SetVisible(true);
+    // vectorLayer
+    vectorLayer2 = new mpFXYVector(_("highTemp"));
+    vectorLayer2->SetContinuity(true);
+    vectorLayer2->SetPen(vectorpen);
+    vectorLayer2->SetDrawOutsideMargins(false);
+
+    /* m_plot */
+    m_plot2 = new mpWindow(this, -1, wxPoint(0, 0), wxSize(100, 100), wxSUNKEN_BORDER);
+    m_plot2->SetMargins(20, 40, 40, 85);
+    m_plot2->AddLayer(xaxis);
+    m_plot2->AddLayer(yaxis);
+    m_plot2->AddLayer(vectorLayer2);
+    m_plot2->AddLayer(new mpText(wxT("highTemp"), 30, 5));
+
+    // vectorLayer
+    vectorLayer3 = new mpFXYVector(_("lowTemp"));
+    vectorLayer3->SetContinuity(true);
+    vectorLayer3->SetPen(vectorpen);
+    vectorLayer3->SetDrawOutsideMargins(false);
+
+    /* m_plot */
+    m_plot3 = new mpWindow(this, -1, wxPoint(0, 0), wxSize(100, 100), wxSUNKEN_BORDER);
+    m_plot3->SetMargins(20, 40, 40, 85);
+    m_plot3->AddLayer(xaxis);
+    m_plot3->AddLayer(yaxis);
+    m_plot3->AddLayer(vectorLayer3);
+    m_plot3->AddLayer(new mpText(wxT("lowTemp"), 30, 5));
+
+    // vectorLayer
+    vectorLayer4 = new mpFXYVector(_("highVoltage"));
+    vectorLayer4->SetContinuity(true);
+    vectorLayer4->SetPen(vectorpen);
+    vectorLayer4->SetDrawOutsideMargins(false);
+
+    /* m_plot */
+    m_plot4 = new mpWindow(this, -1, wxPoint(0, 0), wxSize(100, 100), wxSUNKEN_BORDER);
+    m_plot4->SetMargins(20, 40, 40, 85);
+    m_plot4->AddLayer(xaxis);
+    m_plot4->AddLayer(yaxis);
+    m_plot4->AddLayer(vectorLayer4);
+    m_plot4->AddLayer(new mpText(wxT("highVoltage"), 30, 5));
+
+    // vectorLayer
+    vectorLayer5 = new mpFXYVector(_("lowVoltage"));
+    vectorLayer5->SetContinuity(true);
+    vectorLayer5->SetPen(vectorpen);
+    vectorLayer5->SetDrawOutsideMargins(false);
+
+    /* m_plot */
+    m_plot5 = new mpWindow(this, -1, wxPoint(0, 0), wxSize(100, 100), wxSUNKEN_BORDER);
+    m_plot5->SetMargins(20, 40, 40, 85);
+    m_plot5->AddLayer(xaxis);
+    m_plot5->AddLayer(yaxis);
+    m_plot5->AddLayer(vectorLayer5);
+    m_plot5->AddLayer(new mpText(wxT("lowVoltage"), 30, 5));
+
+    // vectorLayer
+    vectorLayer6 = new mpFXYVector(_("RPM"));
+    vectorLayer6->SetContinuity(true);
+    vectorLayer6->SetPen(vectorpen);
+    vectorLayer6->SetDrawOutsideMargins(false);
+
+    /* m_plot */
+    m_plot6 = new mpWindow(this, -1, wxPoint(0, 0), wxSize(100, 100), wxSUNKEN_BORDER);
+    m_plot6->SetMargins(20, 40, 40, 85);
+    m_plot6->AddLayer(xaxis);
+    m_plot6->AddLayer(yaxis);
+    m_plot6->AddLayer(vectorLayer6);
+    m_plot6->AddLayer(new mpText(wxT("RPM"), 30, 5));
+
+    // vectorLayer
+    vectorLayer7 = new mpFXYVector(_("motorTemp"));
+    vectorLayer7->SetContinuity(true);
+    vectorLayer7->SetPen(vectorpen);
+    vectorLayer7->SetDrawOutsideMargins(false);
+
+    /* m_plot */
+    m_plot7 = new mpWindow(this, -1, wxPoint(0, 0), wxSize(100, 100), wxSUNKEN_BORDER);
+    m_plot7->SetMargins(20, 40, 40, 85);
+    m_plot7->AddLayer(xaxis);
+    m_plot7->AddLayer(yaxis);
+    m_plot7->AddLayer(vectorLayer7);
+    m_plot7->AddLayer(new mpText(wxT("motorTemp"), 30, 5));
+
+    // vectorLayer
+    vectorLayer8 = new mpFXYVector(_("dcBusCurrent"));
+    vectorLayer8->SetContinuity(true);
+    vectorLayer8->SetPen(vectorpen);
+    vectorLayer8->SetDrawOutsideMargins(false);
+
+    /* m_plot */
+    m_plot8 = new mpWindow(this, -1, wxPoint(0, 0), wxSize(100, 100), wxSUNKEN_BORDER);
+    m_plot8->SetMargins(20, 40, 40, 85);
+    m_plot8->AddLayer(xaxis);
+    m_plot8->AddLayer(yaxis);
+    m_plot8->AddLayer(vectorLayer8);
+    m_plot8->AddLayer(new mpText(wxT("dcBusCurrent"), 30, 5));
+
+    // vectorLayer
+    vectorLayer9 = new mpFXYVector(_("motorTorque"));
+    vectorLayer9->SetContinuity(true);
+    vectorLayer9->SetPen(vectorpen);
+    vectorLayer9->SetDrawOutsideMargins(false);
+
+    /* m_plot */
+    m_plot9 = new mpWindow(this, -1, wxPoint(0, 0), wxSize(100, 100), wxSUNKEN_BORDER);
+    m_plot9->SetMargins(20, 40, 40, 85);
+    m_plot9->AddLayer(xaxis);
+    m_plot9->AddLayer(yaxis);
+    m_plot9->AddLayer(vectorLayer9);
+    m_plot9->AddLayer(new mpText(wxT("motorTorque"), 30, 5));
+
+    // vectorLayer
+    vectorLayer10 = new mpFXYVector(_("motorCtrlTemp"));
+    vectorLayer10->SetContinuity(true);
+    vectorLayer10->SetPen(vectorpen);
+    vectorLayer10->SetDrawOutsideMargins(false);
+
+    /* m_plot */
+    m_plot10 = new mpWindow(this, -1, wxPoint(0, 0), wxSize(100, 100), wxSUNKEN_BORDER);
+    m_plot10->SetMargins(20, 40, 40, 85);
+    m_plot10->AddLayer(xaxis);
+    m_plot10->AddLayer(yaxis);
+    m_plot10->AddLayer(vectorLayer10);
+    m_plot10->AddLayer(new mpText(wxT("motorCtrlTemp"), 30, 5));
 
 
-    wxPen mypen(*wxRED, 5, wxPENSTYLE_SOLID);
+    // vectorLayer
+    vectorLayer11 = new mpFXYVector(_("auxVoltage"));
+    vectorLayer11->SetContinuity(true);
+    vectorLayer11->SetPen(vectorpen);
+    vectorLayer11->SetDrawOutsideMargins(false);
 
-    m_log = new wxTextCtrl(this, -1, wxT("This is the log window.\n"), wxPoint(0, 0), wxSize(100, 100), wxTE_MULTILINE);
-    wxLog* old_log = wxLog::SetActiveTarget(new wxLogTextCtrl(m_log));
-    delete old_log;
+    /* m_plot */
+    m_plot11 = new mpWindow(this, -1, wxPoint(0, 0), wxSize(100, 100), wxSUNKEN_BORDER);
+    m_plot11->SetMargins(20, 40, 40, 85);
+    m_plot11->AddLayer(xaxis);
+    m_plot11->AddLayer(yaxis);
+    m_plot11->AddLayer(vectorLayer11);
+    m_plot11->AddLayer(new mpText(wxT("auxVoltage"), 30, 5));
 
-    wxBoxSizer* topsizer = new wxBoxSizer(wxVERTICAL);
+    // vectorLayer
+    vectorLayer12 = new mpFXYVector(_("xAcc"));
+    vectorLayer12->SetContinuity(true);
+    vectorLayer12->SetPen(vectorpen);
+    vectorLayer12->SetDrawOutsideMargins(false);
 
-    topsizer->Add(m_plot, 1, wxEXPAND);
-    topsizer->Add(m_log, 0, wxEXPAND);
+    /* m_plot */
+    m_plot12 = new mpWindow(this, -1, wxPoint(0, 0), wxSize(100, 100), wxSUNKEN_BORDER);
+    m_plot12->SetMargins(20, 40, 40, 85);
+    m_plot12->AddLayer(xaxis);
+    m_plot12->AddLayer(yaxis);
+    m_plot12->AddLayer(vectorLayer12);
+    m_plot12->AddLayer(new mpText(wxT("xAcc"), 30, 5));
 
+    // vectorLayer
+    vectorLayer13 = new mpFXYVector(_("yAcc"));
+    vectorLayer13->SetContinuity(true);
+    vectorLayer13->SetPen(vectorpen);
+    vectorLayer13->SetDrawOutsideMargins(false);
+
+    /* m_plot */
+    m_plot13 = new mpWindow(this, -1, wxPoint(0, 0), wxSize(100, 100), wxSUNKEN_BORDER);
+    m_plot13->SetMargins(20, 40, 40, 85);
+    m_plot13->AddLayer(xaxis);
+    m_plot13->AddLayer(yaxis);
+    m_plot13->AddLayer(vectorLayer13);
+    m_plot13->AddLayer(new mpText(wxT("yAcc"), 30, 5));
+
+    // vectorLayer
+    vectorLayer14 = new mpFXYVector(_("zAcc"));
+    vectorLayer14->SetContinuity(true);
+    vectorLayer14->SetPen(vectorpen);
+    vectorLayer14->SetDrawOutsideMargins(false);
+
+    /* m_plot */
+    m_plot14 = new mpWindow(this, -1, wxPoint(0, 0), wxSize(100, 100), wxSUNKEN_BORDER);
+    m_plot14->SetMargins(20, 40, 40, 85);
+    m_plot14->AddLayer(xaxis);
+    m_plot14->AddLayer(yaxis);
+    m_plot14->AddLayer(vectorLayer14);
+    m_plot14->AddLayer(new mpText(wxT("zAcc"), 30, 5));
+
+    // vectorLayer
+    vectorLayer15 = new mpFXYVector(_("xGyro"));
+    vectorLayer15->SetContinuity(true);
+    vectorLayer15->SetPen(vectorpen);
+    vectorLayer15->SetDrawOutsideMargins(false);
+
+    /* m_plot */
+    m_plot15 = new mpWindow(this, -1, wxPoint(0, 0), wxSize(100, 100), wxSUNKEN_BORDER);
+    m_plot15->SetMargins(20, 40, 40, 85);
+    m_plot15->AddLayer(xaxis);
+    m_plot15->AddLayer(yaxis);
+    m_plot15->AddLayer(vectorLayer15);
+    m_plot15->AddLayer(new mpText(wxT("xGyro"), 30, 5));
+
+    // vectorLayer
+    vectorLayer16 = new mpFXYVector(_("yGyro"));
+    vectorLayer16->SetContinuity(true);
+    vectorLayer16->SetPen(vectorpen);
+    vectorLayer16->SetDrawOutsideMargins(false);
+
+    /* m_plot */
+    m_plot16 = new mpWindow(this, -1, wxPoint(0, 0), wxSize(100, 100), wxSUNKEN_BORDER);
+    m_plot16->SetMargins(20, 40, 40, 85);
+    m_plot16->AddLayer(xaxis);
+    m_plot16->AddLayer(yaxis);
+    m_plot16->AddLayer(vectorLayer16);
+    m_plot16->AddLayer(new mpText(wxT("yGyro"), 30, 5));
+
+    // vectorLayer
+    vectorLayer17 = new mpFXYVector(_("zGyro"));
+    vectorLayer17->SetContinuity(true);
+    vectorLayer17->SetPen(vectorpen);
+    vectorLayer17->SetDrawOutsideMargins(false);
+
+    /* m_plot */
+    m_plot17 = new mpWindow(this, -1, wxPoint(0, 0), wxSize(100, 100), wxSUNKEN_BORDER);
+    m_plot17->SetMargins(20, 40, 40, 85);
+    m_plot17->AddLayer(xaxis);
+    m_plot17->AddLayer(yaxis);
+    m_plot17->AddLayer(vectorLayer17);
+    m_plot17->AddLayer(new mpText(wxT("zGyro"), 30, 5));
+
+    // vectorLayer
+    vectorLayer18 = new mpFXYVector(_("roll"));
+    vectorLayer18->SetContinuity(true);
+    vectorLayer18->SetPen(vectorpen);
+    vectorLayer18->SetDrawOutsideMargins(false);
+
+    /* m_plot */
+    m_plot18 = new mpWindow(this, -1, wxPoint(0, 0), wxSize(100, 100), wxSUNKEN_BORDER);
+    m_plot18->SetMargins(20, 40, 40, 85);
+    m_plot18->AddLayer(xaxis);
+    m_plot18->AddLayer(yaxis);
+    m_plot18->AddLayer(vectorLayer18);
+    m_plot18->AddLayer(new mpText(wxT("roll"), 30, 5));
+
+    // vectorLayer
+    vectorLayer19 = new mpFXYVector(_("pitch"));
+    vectorLayer19->SetContinuity(true);
+    vectorLayer19->SetPen(vectorpen);
+    vectorLayer19->SetDrawOutsideMargins(false);
+
+    /* m_plot */
+    m_plot19 = new mpWindow(this, -1, wxPoint(0, 0), wxSize(100, 100), wxSUNKEN_BORDER);
+    m_plot19->SetMargins(20, 40, 40, 85);
+    m_plot19->AddLayer(xaxis);
+    m_plot19->AddLayer(yaxis);
+    m_plot19->AddLayer(vectorLayer19);
+    m_plot19->AddLayer(new mpText(wxT("pitch"), 30, 5));
+
+
+
+
+
+
+
+    /* Sizer to Hold Plots */
+    wxBoxSizer* mainsizer = new wxBoxSizer(wxHORIZONTAL);
+    leftSizer = new wxBoxSizer(wxVERTICAL);
+    rightSizer = new wxBoxSizer(wxVERTICAL);
+
+    /* Format Plot Space 2x10 */
+    leftSizer->Add(m_plot, 1, wxEXPAND);
+    leftSizer->Add(m_plot1, 1, wxEXPAND);
+    leftSizer->Add(m_plot2, 1, wxEXPAND);
+    leftSizer->Add(m_plot3, 1, wxEXPAND);
+    leftSizer->Add(m_plot4, 1, wxEXPAND);
+    leftSizer->Add(m_plot5, 1, wxEXPAND);
+    leftSizer->Add(m_plot6, 1, wxEXPAND);
+    leftSizer->Add(m_plot7, 1, wxEXPAND);
+    leftSizer->Add(m_plot8, 1, wxEXPAND);
+    leftSizer->Add(m_plot9, 1, wxEXPAND);
+
+    rightSizer->Add(m_plot10, 1, wxEXPAND);
+    rightSizer->Add(m_plot11, 1, wxEXPAND);
+    rightSizer->Add(m_plot12, 1, wxEXPAND);
+    rightSizer->Add(m_plot13, 1, wxEXPAND);
+    rightSizer->Add(m_plot14, 1, wxEXPAND);
+    rightSizer->Add(m_plot15, 1, wxEXPAND);
+    rightSizer->Add(m_plot16, 1, wxEXPAND);
+    rightSizer->Add(m_plot17, 1, wxEXPAND);
+    rightSizer->Add(m_plot18, 1, wxEXPAND);
+    rightSizer->Add(m_plot19, 1, wxEXPAND);
+
+    mainsizer->Add(leftSizer, 1, wxEXPAND);
+    mainsizer->Add(rightSizer, 1, wxEXPAND);
+
+    /* Display Plot Sizers */
     SetAutoLayout(TRUE);
-    SetSizer(topsizer);
+    SetSizer(mainsizer);
 
 
-    m_plot->EnableDoubleBuffer(true);
-    m_plot->SetMPScrollbars(false);
-    m_plot->Fit();
-
-    xAxisValue = 100;
+    /* Initialize X AXIS Value */
+    xAxisValue = 0;
 }
 
 
@@ -428,33 +616,36 @@ MyFrame::MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size)
 /* EVENT HANDLER - ABOUT */
 void MyFrame::OnAbout(wxCommandEvent& event)
 {
-    wxMessageBox("This is a wxWidgets' Hello world sample",
+    wxMessageBox("Bolt IV Graphical User Interface",
         "About Hello World", wxOK | wxICON_INFORMATION);
 }
 
 /* EVENT HANDLER - EXIT */
 void MyFrame::OnExit(wxCommandEvent& event)
 {
+    xBee.DeletePort();
     Close(true);
 }
 
 /* EVENT HANDLER - HELLO */
 void MyFrame::OnHello(wxCommandEvent& event)
 {
-    wxLogMessage("Hello world from wxWidgets!");
+    wxLogMessage("Bolt IV Graphical User Interface");
 }
 
 /* EVENT HANDLER - SYSTEM ANALYSIS */
 void MyFrame::OnViewSA(wxCommandEvent& event)
 {
     wxLogMessage("Bolt Port Closed");
-    xBee.DeletePort();
 }
 
 /* EVENT HANDLER - SYSTEM OVERVIEW */
 void MyFrame::OnViewSO(wxCommandEvent& event)
 {
-    wxLogMessage("MOST RECENT DATA IN");
+    /* Create Plotting Event */
+    xBee.CreatePort();
+    wxTimer* m_timer = new wxTimer(this, ID_Timer);
+    m_timer->Start(600);
 }
 
 
@@ -463,15 +654,54 @@ void MyFrame::OnViewSO(wxCommandEvent& event)
 /* EVENT HANDLER - SYSTEM OVERVIEW */
 void MyFrame::TimerCall(wxTimerEvent& event)
 {
-    //movedUart.parseDataIn();
-
+    /* Format Incomming Data */
     xBee.formatInputString();
     xBee.refreshBoltIVdata();
 
-    //MainEditBox->WriteText(movedUart.BoltData);
-    //MainEditBox->WriteText('\n');
+    /* Update Data Vectors */
+    vectorLayer->AddData(xAxisValue, xBee.BoltIV.SOC, xAxisVector.SOC, yAxisVector.SOC);
+    vectorLayer1->AddData(xAxisValue, xBee.BoltIV.FPV, xAxisVector.FPV, yAxisVector.FPV);
+    vectorLayer2->AddData(xAxisValue, xBee.BoltIV.highTemp, xAxisVector.highTemp, yAxisVector.highTemp);
+    vectorLayer3->AddData(xAxisValue, xBee.BoltIV.lowTemp, xAxisVector.lowTemp, yAxisVector.lowTemp);
+    vectorLayer4->AddData(xAxisValue, xBee.BoltIV.highVoltage, xAxisVector.highVoltage, yAxisVector.highVoltage);
+    vectorLayer5->AddData(xAxisValue, xBee.BoltIV.lowVoltage, xAxisVector.lowVoltage, yAxisVector.lowVoltage);
+    vectorLayer6->AddData(xAxisValue, xBee.BoltIV.RPM, xAxisVector.RPM, yAxisVector.RPM);
+    vectorLayer7->AddData(xAxisValue, xBee.BoltIV.motorTemp, xAxisVector.motorTemp, yAxisVector.motorTemp);
+    vectorLayer8->AddData(xAxisValue, xBee.BoltIV.dcBusCurrent, xAxisVector.dcBusCurrent, yAxisVector.dcBusCurrent);
+    vectorLayer9->AddData(xAxisValue, xBee.BoltIV.motorTorque, xAxisVector.motorTorque, yAxisVector.motorTorque);
+    vectorLayer10->AddData(xAxisValue, xBee.BoltIV.motorCtrlTemp, xAxisVector.motorCtrlTemp, yAxisVector.motorCtrlTemp);
+    vectorLayer11->AddData(xAxisValue, xBee.BoltIV.auxVoltage, xAxisVector.auxVoltage, yAxisVector.auxVoltage);
+    vectorLayer12->AddData(xAxisValue, xBee.BoltIV.xAcc, xAxisVector.xAcc, yAxisVector.xAcc);
+    vectorLayer13->AddData(xAxisValue, xBee.BoltIV.yAcc, xAxisVector.yAcc, yAxisVector.yAcc);
+    vectorLayer14->AddData(xAxisValue, xBee.BoltIV.zAcc, xAxisVector.zAcc, yAxisVector.zAcc);
+    vectorLayer15->AddData(xAxisValue, xBee.BoltIV.xGyro, xAxisVector.xGyro, yAxisVector.xGyro);
+    vectorLayer16->AddData(xAxisValue, xBee.BoltIV.yGyro, xAxisVector.yGyro, yAxisVector.yGyro);
+    vectorLayer17->AddData(xAxisValue, xBee.BoltIV.zGyro, xAxisVector.zGyro, yAxisVector.zGyro);
+    vectorLayer18->AddData(xAxisValue, xBee.BoltIV.roll, xAxisVector.roll, yAxisVector.roll);
+    vectorLayer19->AddData(xAxisValue, xBee.BoltIV.pitch, xAxisVector.pitch, yAxisVector.pitch);
 
-    vectorLayer->AddData(xAxisValue, xBee.BoltIV.SOC, xAxisVector, yAxisVector.SOC);
+    /* Update Plots */
     m_plot->Fit();
-    xAxisValue++;
+    m_plot1->Fit();
+    m_plot2->Fit();
+    m_plot3->Fit();
+    m_plot4->Fit();
+    m_plot5->Fit();
+    m_plot6->Fit();
+    m_plot7->Fit();
+    m_plot8->Fit();
+    m_plot9->Fit();
+    m_plot10->Fit();
+    m_plot11->Fit();
+    m_plot12->Fit();
+    m_plot13->Fit();
+    m_plot14->Fit();
+    m_plot15->Fit();
+    m_plot16->Fit();
+    m_plot17->Fit();
+    m_plot18->Fit();
+    m_plot19->Fit();
+
+    /* Update x Axis Value */
+    xAxisValue = xAxisValue + 500;
 }
